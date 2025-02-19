@@ -1,0 +1,242 @@
+/* ✅ Fondo blanco sin bordes */
+.home-container {
+  font-family: 'Arial', sans-serif;
+  background: #ffffff;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 10%;
+  overflow: hidden;
+}
+
+/* ✅ Navbar completamente alineado */
+.navbar {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(255, 255, 255, 0.8); /* Fondo semitransparente */
+  -webkit-backdrop-filter: blur(10px); /* Compatibilidad con Safari */
+  backdrop-filter: blur(10px); /* Difuminado en navegadores modernos */
+  padding: 15px 5%;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-sizing: border-box;
+}
+
+/* ✅ Logo alineado a la izquierda */
+.navbar .logo img {
+  width: 50px;
+  margin-right: 20px;
+}
+
+/* ✅ Contenedor del navbar */
+.navbar-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* ✅ Enlaces del navbar alineados antes del botón "Ingresar" */
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+  white-space: nowrap;
+  margin-right: 20px;
+}
+
+.nav-links li {
+  display: inline;
+}
+
+.nav-links a {
+  text-decoration: none;
+  color: #333;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+.nav-links a:hover {
+  color: #1cbf73;
+}
+
+/* ✅ Botón Ingresar alineado a la derecha */
+.btn-signin {
+  background: #1cbf73;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-signin:hover {
+  background: #17a363;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ✅ Sección Hero */
+.hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1200px;
+  padding-top: 100px;
+}
+
+/* ✅ Texto principal */
+.hero-text {
+  max-width: 50%;
+  text-align: left;
+}
+
+.hero-text h1 {
+  font-size: 3.5rem;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 10px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+/* ✅ Colores del título */
+.hero-text h1 .highlight-green {
+  color: #1cbf73;
+}
+
+.hero-text h1 .highlight-blue {
+  color: #2b3a67;
+}
+
+.hero-text p {
+  font-size: 1.2rem;
+  color: #555;
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+/* ✅ Botones principales */
+.buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.btn-primary, .btn-download {
+  border: none;
+  padding: 12px 25px;
+  border-radius: 30px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: 0.3s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+  background: #1cbf73;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #17a363;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-download {
+  background: #007bff;
+  color: white;
+}
+
+.btn-download:hover {
+  background: #0056b3;
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ✅ Imagen Hero */
+.hero-image {
+  max-width: 40%; /* Ajusta el tamaño de la imagen */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-image img {
+  width: 100%; /* O ajusta a 110% si la quieres un poco más grande */
+  max-height: 500px; /* Ajusta este valor si es necesario */
+  object-fit: contain;
+}
+
+
+/* ✅ Redes Sociales */
+.social-icons {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.social-icons img {
+  width: 35px;
+  height: 35px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.social-icons img:hover {
+  opacity: 0.8;
+}
+
+/* 📌 RESPONSIVE DESIGN */
+@media (max-width: 1024px) {
+  .hero {
+    flex-direction: column;
+    text-align: center;
+    padding-top: 120px;
+  }
+
+  .hero-text {
+    max-width: 90%;
+    text-align: center;
+  }
+
+  .buttons {
+    justify-content: center;
+  }
+
+  .hero-image {
+    max-width: 60%;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-text h1 {
+    font-size: 2.5rem;
+  }
+
+  .hero-image {
+    max-width: 70%;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+
+  .hero-image {
+    max-width: 80%;
+  }
+}
