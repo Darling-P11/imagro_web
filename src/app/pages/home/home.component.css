@@ -199,6 +199,27 @@
   opacity: 0.8;
 }
 
+/* 🟩 Cambiar color y animación cuando se pasa el mouse */
+button:hover {
+  background: #088a66; /* ✅ Verde más oscuro */
+  transform: translateY(-3px); /* ✅ Efecto de elevación */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* ✅ Sombra para profundidad */
+}
+
+/* ✅ Efecto hover para el enlace de recuperar contraseña */
+.extra-options a {
+  text-decoration: none;
+  color: #0ba27f;
+  font-weight: bold;
+  transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+/* 🖱️ Cambiar color y subrayar al pasar el mouse */
+.extra-options a:hover {
+  color: #088a66;
+  text-decoration: underline;
+}
+
 /* 📌 RESPONSIVE DESIGN */
 @media (max-width: 1024px) {
   .hero {

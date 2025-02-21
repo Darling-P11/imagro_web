@@ -51,13 +51,22 @@ input {
   padding: 12px;
   margin-bottom: 15px;
   border: 1px solid #ccc;
-  border-radius: 10px; /* Más redondeo */
+  border-radius: 8px; /* ✅ Bordes más redondeados */
   font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease; /* ✅ Transición suave */
+}
+
+input:hover {
+  border-color: #0ba27f; /* ✅ Cambia el borde al verde */
+  box-shadow: 0 0 8px rgba(11, 162, 127, 0.4); /* ✅ Efecto de sombra suave */
 }
 
 /* 🔹 Contenedor de la contraseña con icono de visibilidad */
+/* Contenedor de la contraseña con icono */
 .password-container {
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
 .password-container input {
@@ -65,16 +74,17 @@ input {
 }
 
 /* 🔹 Ajuste del icono del ojo */
+/* Icono del ojo */
 .toggle-password {
   position: absolute;
-  right: 12px; /* Mantenerlo alineado dentro del input */
-  top: 50%;
-  transform: translateY(-50%);
+  right: 10px;
   cursor: pointer;
   font-size: 1.2rem;
-  color: #555;
-  background: none;
-  border: none;
+  color: #777;
+  transition: 0.3s ease-in-out;
+}
+.toggle-password:hover {
+  color: #0ba27f;
 }
 
 /* 🔹 Ajuste del tamaño del ícono */
@@ -185,4 +195,99 @@ input {
   background: linear-gradient(to bottom left, #0ba27f, #00cc99);
   right: 0;
   bottom: 10%;
+}
+/* ✅ Alerta de error y éxito */
+.alert {
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.alert.error {
+  background: #ffdddd;
+  color: #d8000c;
+  border: 1px solid #d8000c;
+}
+
+.alert.success {
+  background: #ddffdd;
+  color: #4f8a10;
+  border: 1px solid #4f8a10;
+}
+
+/* ✅ Estilo para inputs inválidos */
+input.invalid {
+  border: 2px solid #d8000c;
+  background: #ffdddd;
+}
+
+/* ✅ Mensajes de error debajo de los inputs */
+.error-text {
+  color: #d8000c;
+  font-size: 0.85rem;
+  margin-top: -8px;
+  display: block;
+}
+
+/* ✅ Deshabilitar botón si el formulario es inválido */
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+button {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px; /* ✅ Bordes redondeados */
+  background: #0ba27f; /* ✅ Color verde inicial */
+  color: rgb(88, 88, 88);
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background: #088a66; /* ✅ Verde más oscuro */
+  transform: translateY(-3px); /* ✅ Efecto de elevación */
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2); /* ✅ Sombra para profundidad */
+}
+
+/* ✅ Efecto hover para el enlace de recuperar contraseña */
+.extra-options a {
+  text-decoration: none;
+  color: #0ba27f;
+  font-weight: bold;
+  transition: color 0.3s ease, text-decoration 0.3s ease;
+}
+
+/* 🖱️ Cambiar color y subrayar al pasar el mouse */
+.extra-options a:hover {
+  color: #088a66;
+  text-decoration: underline;
+}
+
+/* 🔹 Animación de entrada y salida */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.alert {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.imagro-logo {
+  width: 100px;
+  margin: 0 auto 20px;
+  display: block;
 }
