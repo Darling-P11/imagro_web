@@ -1,25 +1,87 @@
+
+.header.sidebar-collapsed {
+  padding-left: 110px; /* Ajustar el espacio cuando el sidebar está colapsado */
+}
+
+/* 🟩 Cambiar color y animación cuando se pasa el mouse */
+button:hover {
+  
+  transform: translateY(-3px); /* ✅ Efecto de elevación */
+
+}
+
+/* 🔹 Animaciones de entrada y salida */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+}
+
+/* 🔹 Efecto para la carga del dashboard */
 .dashboard-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    text-align: center;
-  }
+  animation: fadeIn 0.5s ease-out;
+}
+
+/* 🔹 Efecto hover en el sidebar */
+.sidebar__link {
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.sidebar__link:hover {
+  color: #0ba27f; /* Verde animado */
+  transform: translateX(5px); /* Movimiento hacia la derecha */
+}
+
+/* 🔹 Efecto hover en los botones */
+button {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+
+  transform: translateY(-3px);
+
+}
+
+/* 🔹 Fondos de gradiente en el Dashboard */
+.gradient-left,
+.gradient-right {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  filter: blur(90px);
+  z-index: 0;
+}
+
+.gradient-left {
+  background: linear-gradient(to bottom right, #0ba27f, #00cc99);
+  left: -100px;
+  top: -50px;
+}
+
+.gradient-right {
+  background: linear-gradient(to bottom left, #0ba27f, #00cc99);
+  right: -100px;
+  bottom: -50px;
+}
+.imagro-logo {
+  width: 100px;
   
-  .btn-logout {
-    padding: 12px 20px;
-    margin-top: 20px;
-    background-color: #0ba27f;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .btn-logout:hover {
-    background-color: #088a66;
-  }
-  
+}

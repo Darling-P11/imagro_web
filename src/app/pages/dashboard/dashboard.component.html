@@ -1,5 +1,97 @@
-<div class="dashboard-container">
-    <h1>Bienvenido al Dashboard</h1>
-    <button class="btn-logout" (click)="logout()">Cerrar Sesión</button>
+<header class="header" [ngClass]="{ 'sidebar-collapsed': isSidebarCollapsed }">
+  <div class="header__container">
+    <button
+      type="button"
+      (click)="toggleSidebar()"
+      class="header__toggle"
+      title="Alternar barra lateral"
+    >
+      <i class="ri-menu-line"></i>
+    </button>
+
+    <a href="/dashboard" class="header__logo">
+      <img
+        src="assets/images/logo_banner_verde.png"
+        alt="Imagro Logo"
+        class="imagro-logo"
+      />
+    </a>
   </div>
-  
+</header>
+
+<!-- Sidebar -->
+<nav
+  class="sidebar"
+  [ngClass]="{ 'show-sidebar': isSidebarCollapsed }"
+  id="sidebar"
+>
+  <div class="sidebar__container">
+    <div class="sidebar__user">
+      <div class="sidebar__img">
+        <img [src]="userPhoto" alt="image" />
+      </div>
+
+      <div class="sidebar__info">
+        <h3 class="user-name">{{ userName }}</h3>
+        <!-- ✅ Nombre en segunda línea si es necesario -->
+        <span class="user-email">{{ userEmail }}</span>
+        <!-- ✅ Correo en una línea separada -->
+        <small class="user-role">Rol: {{ userRole | titlecase }}</small>
+        <!-- ✅ Rol debajo del correo -->
+      </div>
+    </div>
+
+    <div class="sidebar__content">
+      <div>
+        <h3 class="sidebar__title">MANAGE</h3>
+        <div class="sidebar__list">
+          <a routerLink="/dashboard" class="sidebar__link active-link">
+            <i class="ri-pie-chart-2-fill"></i>
+            <span *ngIf="!isSidebarCollapsed">Dashboard</span>
+          </a>
+          <a routerLink="/view-images" class="sidebar__link">
+            <i class="ri-image-fill"></i>
+            <span *ngIf="!isSidebarCollapsed">Ver Imágenes</span>
+          </a>
+          <a routerLink="/generate-models" class="sidebar__link">
+            <i class="ri-bar-chart-box-fill"></i>
+            <span *ngIf="!isSidebarCollapsed">Generar Modelos</span>
+          </a>
+        </div>
+      </div>
+
+      <div>
+        <h3 class="sidebar__title">ADMIN TOOLS</h3>
+        <div class="sidebar__list">
+          <a routerLink="/contributions" class="sidebar__link">
+            <i class="ri-database-2-fill"></i>
+            <span *ngIf="!isSidebarCollapsed">Contribuciones</span>
+          </a>
+          <a routerLink="/users" class="sidebar__link">
+            <i class="ri-user-fill"></i>
+            <span *ngIf="!isSidebarCollapsed">Usuarios</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="sidebar__actions">
+      <!-- Botón de Acerca de -->
+      <button (click)="showAbout()" class="sidebar__link">
+        <i class="ri-information-fill"></i>
+        <span>Acerca de</span>
+      </button>
+      <button class="sidebar__link" (click)="logout()">
+        <i class="ri-logout-box-r-fill"></i>
+        <span *ngIf="!isSidebarCollapsed">Cerrar Sesión</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<main
+  class="main container"
+  [ngClass]="{ 'left-pd': isSidebarCollapsed }"
+  id="main"
+></main>

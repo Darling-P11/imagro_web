@@ -14,7 +14,7 @@ import {
   onAuthStateChanged, // Importante para verificar el estado de autenticación
   User
 } from '@angular/fire/auth';
-import { Firestore, doc, setDoc } from '@angular/fire/firestore';
+import { Firestore, doc, setDoc, getDoc } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -22,8 +22,8 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
   constructor(private auth: Auth, private firestore: Firestore) {
-    // ✅ Configurar persistencia de sesión en el almacenamiento local
-    setPersistence(this.auth, browserLocalPersistence)
+    // ✅ Configurar persistencia de sesión en el almacenamiento local con sintaxis correcta
+    setPersistence(auth, browserLocalPersistence)
       .then(() => {
         console.log('Persistencia habilitada correctamente');
       })
@@ -36,13 +36,29 @@ export class AuthService {
   isLoggedIn(): Observable<boolean> {
     return new Observable<boolean>((observer) => {
       onAuthStateChanged(this.auth, (user: User | null) => {
-        if (user) {
-          observer.next(true); // Usuario autenticado
-        } else {
-          observer.next(false); // No autenticado
-        }
+        observer.next(!!user); // Verificar si el usuario está autenticado
       });
     });
+  }
+
+  // ✅ Obtener el rol del usuario autenticado desde Firestore
+  async getUserRole(uid: string): Promise<string | null> {
+    try {
+      const userDoc = doc(this.firestore, 'users', uid);
+      const userSnapshot = await getDoc(userDoc);
+
+      if (userSnapshot.exists()) {
+        const userData = userSnapshot.data();
+        console.log('Rol del usuario:', userData['role']); // Verificar el rol en consola
+        return userData['role']; // Retornar el rol
+      } else {
+        console.warn('El usuario no existe en Firestore');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error al obtener el rol del usuario:', error);
+      return null;
+    }
   }
 
   // 🔹 Inicio de sesión con correo y contraseña
@@ -58,8 +74,7 @@ export class AuthService {
 
   // 🔹 Cerrar sesión
   logout() {
-    const auth = getAuth();
-    return signOut(auth);
+    return signOut(this.auth);
   }
 
   // 🔹 Registro con Google y almacenamiento en Firestore
@@ -76,7 +91,7 @@ export class AuthService {
         email: user.email,
         phoneNumber: user.phoneNumber || '', // Google puede no proporcionar el número
         photoURL: user.photoURL, // Foto de perfil de Google
-        role: 'usuario',
+        role: 'usuario', // Por defecto asignar rol de usuario
         createdAt: new Date(),
       });
 
@@ -115,7 +130,7 @@ export class AuthService {
         name,
         phoneNumber,
         photoURL: photo,
-        role: 'usuario',
+        role: 'usuario', // Se asigna el rol de usuario por defecto
         createdAt: new Date(),
       });
 
