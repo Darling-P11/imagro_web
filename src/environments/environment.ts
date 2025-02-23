@@ -1,3 +1,5 @@
+import { initializeApp } from 'firebase/app';
+import { getAuth, setPersistence, browserLocalPersistence } from 'firebase/auth';
 export const environment = {
     production: false,
     firebaseConfig: {
@@ -9,4 +11,3 @@ export const environment = {
         appId: "1:958505003291:web:998707d9335ee5ca1ccbbe"
     }
   };
-  

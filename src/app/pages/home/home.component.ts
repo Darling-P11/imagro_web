@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
+import { AuthService } from '../../services/auth.service'; // Importar el servicio de autenticación
 
 @Component({
   selector: 'app-home',
@@ -15,10 +16,20 @@ import { trigger, transition, style, animate } from '@angular/animations';
     ])
   ]
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private authService: AuthService) {}
 
+  ngOnInit(): void {
+    // Verificar si el usuario ya está autenticado
+    this.authService.isLoggedIn().subscribe((isAuthenticated) => {
+      if (isAuthenticated) {
+        this.router.navigate(['/dashboard']); // Redirigir automáticamente al dashboard si está autenticado
+      }
+    });
+  }
+
+  // Método para redirigir al login con una pequeña animación de retraso
   goToLogin() {
     setTimeout(() => {
       this.router.navigate(['/login']);
