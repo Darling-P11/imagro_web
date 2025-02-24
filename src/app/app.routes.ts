@@ -8,6 +8,8 @@ import { AuthGuard } from './guards/auth.guard';
 import { RedirectIfLoggedInGuard } from './guards/redirect-if-logged-in.guard';
 import { ContributionsComponent } from './pages/admin/contributions/contributions.component';
 
+
+
 export const routes: Routes = [
   // Mostrar Home en la ruta raíz, redirigir si el usuario está logueado
   { path: '', component: HomeComponent, canActivate: [RedirectIfLoggedInGuard] },

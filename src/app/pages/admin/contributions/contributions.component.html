@@ -1,11 +1,15 @@
-<div class="contributions-container">
-  <h2>Revisión de Contribuciones</h2>
+<div class="table-container">
+  <!-- 🔄 Spinner de carga mientras se cargan las contribuciones -->
+  <div *ngIf="isLoading" class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Cargando contribuciones...</p>
+  </div>
 
-  <table class="contributions-table">
+  <!-- ✅ Tabla de contribuciones -->
+  <table *ngIf="!isLoading">
     <thead>
       <tr>
-        <th>ID</th>
-        <th>Usuario</th>
+        <th>Nombre del Usuario</th>
         <th>Fecha de Envío</th>
         <th>Cantidad de Cultivos</th>
         <th>Estado</th>
@@ -15,31 +19,23 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let contribution of contributions">
-        <td>{{ contribution.id }}</td>
-        <td>{{ contribution.userName }}</td>
-        <td>{{ contribution.fechaEnvio | date: 'shortDate' }}</td>
-        <td>{{ contribution.cantidadCultivos }}</td>
-        <td>{{ contribution.estado | titlecase }}</td>
-        <td>{{ contribution.cantidadImagenes }}</td>
+      <tr *ngFor="let contribution of contributions" (click)="selectContribution(contribution)">
+        <td>{{ contribution.nombreUsuario }}</td> <!-- ✅ Nombre del usuario -->
+        <td>{{ contribution.contributionDetails.fecha_contribucion | date: 'short' }}</td> <!-- ✅ Fecha formateada -->
+        <td>{{ contribution.configuracionCompleta.cultivos.length }}</td> <!-- ✅ Cantidad de cultivos -->
+        <td>{{ contribution.configuracionCompleta.estado }}</td> <!-- ✅ Estado -->
+        <td>{{ contribution.contributionDetails.cantidad_imagenes }}</td> <!-- ✅ Cantidad de imágenes -->
         <td>
-          <button (click)="showConfiguration(contribution.userId, contribution.id)">Ver Configuración</button>
+          <button class="config-btn" (click)="viewConfiguration(contribution)">
+            Ver Configuración
+          </button>
         </td>
         <td>
-          <button (click)="viewDetails(contribution.id)">Ver Detalles</button>
-          <button (click)="approveContribution(contribution.id)">Aprobar</button>
-          <button (click)="denyContribution(contribution.id)">Denegar</button>
+          <button class="action-button accept" (click)="updateStatus(contribution, 'aceptado')">Aceptar</button>
+          <button class="action-button reject" (click)="updateStatus(contribution, 'rechazado')">Rechazar</button>
+          <button class="action-button view" (click)="selectContribution(contribution)">Visualizar</button>
         </td>
       </tr>
     </tbody>
   </table>
-
-  <!-- ✅ Pop-up de Configuración -->
-  <div *ngIf="showConfigPopup" class="popup">
-    <div class="popup-content">
-      <h3>Configuración de la Contribución</h3>
-      <pre>{{ selectedConfig | json }}</pre>
-      <button (click)="closePopup()">Cerrar</button>
-    </div>
-  </div>
 </div>

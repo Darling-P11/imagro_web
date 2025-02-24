@@ -1,85 +1,215 @@
-.contributions-container {
-    padding: 2rem;
-    background: #f9f9f9;
+/* 🎨 Contenedor principal de la tabla */
+.table-container {
+  overflow-x: auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+  width: 100%;
+  max-width: 1200px; /* ✅ Mismo ancho que el header */
+}
+
+/* 📊 Estilo general de la tabla */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+/* 🎨 Encabezado de la tabla mejorado */
+thead {
+  background: linear-gradient(90deg, #0ba27f, #088a66);
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 15px 15px 0 0;
+}
+
+thead th {
+  padding: 15px;
+  text-align: center;
+  font-weight: bold;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  border-right: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+thead th:last-child {
+  border-right: none;
+}
+
+/* 🟩 Efecto hover en los encabezados */
+thead th::after {
+  content: '';
+  position: absolute;
+  width: 0%;
+  height: 3px;
+  background-color: #e6fff2;
+  left: 0;
+  bottom: 0;
+  transition: width 0.3s ease-in-out;
+}
+
+thead th:hover::after {
+  width: 100%;
+}
+
+/* 📄 Celdas del cuerpo de la tabla */
+tbody td {
+  text-align: center;
+  padding: 12px;
+  font-size: 0.9rem;
+  color: #333;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f9f9f9;
+}
+
+/* 📌 Celdas de datos */
+tbody tr {
+  background: #ffffff;
+  border-radius: 8px;
+  transition: background 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ✅ Redondear las esquinas de la tabla */
+tbody tr:first-child td:first-child {
+  border-top-left-radius: 15px;
+}
+tbody tr:first-child td:last-child {
+  border-top-right-radius: 15px;
+}
+tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 15px;
+}
+tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 15px;
+}
+
+/* 🟩 Hover en filas */
+tbody tr:hover {
+  background-color: #e6fff2;
+  transform: translateY(-2px);
+}
+
+/* ✅ Botones de acción */
+.action-button {
+  display: inline-block;
+  width: 100px;
+  padding: 10px 0;
+  margin: 5px;
+  text-align: center;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  color: #fff;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.accept {
+  background-color: #0ba27f;
+}
+
+.accept:hover {
+  background-color: #088a66;
+  transform: translateY(-2px);
+}
+
+.reject {
+  background-color: #d9534f;
+}
+
+.reject:hover {
+  background-color: #b52b27;
+  transform: translateY(-2px);
+}
+
+.view {
+  background-color: #457b9d;
+}
+
+.view:hover {
+  background-color: #2a5d7d;
+  transform: translateY(-2px);
+}
+
+/* 🔧 Botón de configuración */
+.config-btn {
+  background-color: #f1c40f;
+  color: #fff;
+  width: 150px;
+  padding: 10px;
+  text-align: center;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  display: block;
+  margin: 0 auto;
+}
+
+.config-btn:hover {
+  background-color: #d4ac0d;
+  transform: translateY(-2px);
+}
+
+/* ✨ Animación de entrada */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-  
-  .contribution-card {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    background: white;
-    margin-bottom: 1rem;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .contribution-card img {
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
-    border-radius: 8px;
-    margin-right: 1rem;
+}
+
+/* 🔄 Estilo del contenedor del spinner */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background-color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin: 20px;
+}
+
+/* 🔄 Animación del spinner */
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 6px solid #e0e0e0;
+  border-top: 6px solid #0ba27f;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+/* 🔄 Animación giratoria */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
-  
-  .contribution-details {
-    flex-grow: 1;
-  }
-  
-  .actions button {
-    margin-right: 10px;
-    padding: 8px 12px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    background-color: #0ba27f;
-    color: white;
-    transition: background-color 0.3s;
-  }
-  
-  .actions button:hover {
-    background-color: #088a66;
-  }
-  
-  .contributions-container {
-    padding: 2rem;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-  }
-  
-  .contributions-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 1rem;
-  }
-  
-  .contributions-table th, .contributions-table td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
-  }
-  
-  .contributions-table th {
-    background-color: #0ba27f;
-    color: white;
-  }
-  
-  /* Popup styles */
-  .popup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .popup-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-  }
-  
+}
+
+/* 📝 Texto de carga */
+.loading-spinner p {
+  font-size: 1rem;
+  color: #555;
+  font-family: 'Poppins', sans-serif;
+}

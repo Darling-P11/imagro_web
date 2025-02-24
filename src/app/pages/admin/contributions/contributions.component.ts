@@ -1,46 +1,58 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ContributionsService } from '../../../services/contributions.service';
+import { ContributionService } from '../../../services/contribution.service';
+import { getAuth } from 'firebase/auth';
+import { CommonModule, DatePipe, JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-contributions',
-  standalone: true,
-  imports: [CommonModule],
+  standalone: true, // ✅ Asegurar standalone para usar pipes
+  imports: [CommonModule, DatePipe, JsonPipe],
   templateUrl: './contributions.component.html',
-  styleUrls: ['./contributions.component.css']
+  styleUrls: ['./contributions.component.css'],
 })
 export class ContributionsComponent implements OnInit {
   contributions: any[] = [];
-  selectedConfig: any = null;
-  showConfigPopup: boolean = false;
+  isLoading: boolean = true;
+  selectedContribution: any = null;
 
-  constructor(private contributionsService: ContributionsService) {}
+  constructor(private contributionService: ContributionService) {}
 
-  async ngOnInit() {
-    this.contributions = await this.contributionsService.getPendingContributions();
+  ngOnInit(): void {
+    this.loadPendingContributions(); // ✅ Eliminar parámetro userId
   }
 
-  // ✅ Mostrar configuración en un pop-up
-  async showConfiguration(userId: string, configId: string) {
-    this.selectedConfig = await this.contributionsService.getContributionConfig(userId, configId);
-    this.showConfigPopup = true;
+  // 🔄 Cargar contribuciones pendientes de todos los usuarios
+  loadPendingContributions(): void {
+    this.contributionService.getPendingContributions().subscribe((data) => {
+      this.contributions = data;
+      this.isLoading = false;
+    });
   }
 
-  closePopup() {
-    this.showConfigPopup = false;
-    this.selectedConfig = null;
+  // 📄 Seleccionar una contribución para mostrar detalles
+  selectContribution(contribution: any): void {
+    this.selectedContribution = contribution;
   }
 
-  // ✅ Acciones
-  approveContribution(id: string) {
-    console.log('Aprobar contribución:', id);
+  // ✅ Actualizar estado de una contribución (aceptar o rechazar)
+  async updateStatus(contribution: any, status: string): Promise<void> {
+    await this.contributionService.updateContributionStatus(
+      contribution.usuarioId,
+      contribution.configId,
+      status
+    );
+    this.loadPendingContributions(); // 🔄 Actualizar la lista completa
   }
 
-  denyContribution(id: string) {
-    console.log('Denegar contribución:', id);
+  // 🔍 Visualizar configuración
+  viewConfiguration(contribution: any): void {
+    console.log('Ver configuración de:', contribution);
+    // Aquí agregaremos la lógica para abrir el detalle de configuración
   }
 
-  viewDetails(id: string) {
-    console.log('Ver detalles de la contribución:', id);
+  // 📄 Visualizar contribución
+  viewContribution(contribution: any): void {
+    console.log('Visualizando contribución:', contribution);
+    // Aquí se podría abrir un modal o una nueva vista
   }
 }
