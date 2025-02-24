@@ -1,0 +1,45 @@
+<div class="contributions-container">
+  <h2>Revisión de Contribuciones</h2>
+
+  <table class="contributions-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Usuario</th>
+        <th>Fecha de Envío</th>
+        <th>Cantidad de Cultivos</th>
+        <th>Estado</th>
+        <th>Cantidad de Imágenes</th>
+        <th>Configuración</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let contribution of contributions">
+        <td>{{ contribution.id }}</td>
+        <td>{{ contribution.userName }}</td>
+        <td>{{ contribution.fechaEnvio | date: 'shortDate' }}</td>
+        <td>{{ contribution.cantidadCultivos }}</td>
+        <td>{{ contribution.estado | titlecase }}</td>
+        <td>{{ contribution.cantidadImagenes }}</td>
+        <td>
+          <button (click)="showConfiguration(contribution.userId, contribution.id)">Ver Configuración</button>
+        </td>
+        <td>
+          <button (click)="viewDetails(contribution.id)">Ver Detalles</button>
+          <button (click)="approveContribution(contribution.id)">Aprobar</button>
+          <button (click)="denyContribution(contribution.id)">Denegar</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- ✅ Pop-up de Configuración -->
+  <div *ngIf="showConfigPopup" class="popup">
+    <div class="popup-content">
+      <h3>Configuración de la Contribución</h3>
+      <pre>{{ selectedConfig | json }}</pre>
+      <button (click)="closePopup()">Cerrar</button>
+    </div>
+  </div>
+</div>

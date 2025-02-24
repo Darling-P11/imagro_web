@@ -33,50 +33,61 @@
 
       <div class="sidebar__info">
         <h3 class="user-name">{{ userName }}</h3>
-        <!-- ✅ Nombre en segunda línea si es necesario -->
         <span class="user-email">{{ userEmail }}</span>
-        <!-- ✅ Correo en una línea separada -->
         <small class="user-role">Rol: {{ userRole | titlecase }}</small>
-        <!-- ✅ Rol debajo del correo -->
       </div>
     </div>
 
     <div class="sidebar__content">
-      <div>
+      <!-- 🔓 MÓDULOS PARA USUARIO NORMAL Y ADMINISTRADOR DE CULTIVO -->
+      <div *ngIf="isUsuario() || isAdminCultivo()">
         <h3 class="sidebar__title">MANAGE</h3>
         <div class="sidebar__list">
           <a routerLink="/dashboard" class="sidebar__link active-link">
             <i class="ri-pie-chart-2-fill"></i>
-            <span *ngIf="!isSidebarCollapsed">Dashboard</span>
+            <span *ngIf="!isSidebarCollapsed">Inicio</span>
           </a>
-          <a routerLink="/view-images" class="sidebar__link">
+          <a routerLink="/datasets" class="sidebar__link">
             <i class="ri-image-fill"></i>
-            <span *ngIf="!isSidebarCollapsed">Ver Imágenes</span>
+            <span *ngIf="!isSidebarCollapsed">Datasets</span>
           </a>
           <a routerLink="/generate-models" class="sidebar__link">
             <i class="ri-bar-chart-box-fill"></i>
             <span *ngIf="!isSidebarCollapsed">Generar Modelos</span>
           </a>
+          <a routerLink="/profile" class="sidebar__link">
+            <i class="ri-user-3-fill"></i>
+            <span *ngIf="!isSidebarCollapsed">Perfil</span>
+          </a>
+          <a routerLink="/contributions" class="sidebar__link">
+            <i class="ri-file-list-fill"></i>
+            <span *ngIf="!isSidebarCollapsed">Contribuciones</span>
+          </a>
         </div>
       </div>
 
-      <div>
+      <!-- 🔐 MÓDULOS EXCLUSIVOS PARA ADMINISTRADOR DE CULTIVO -->
+      <div *ngIf="isAdminCultivo()">
         <h3 class="sidebar__title">ADMIN TOOLS</h3>
         <div class="sidebar__list">
-          <a routerLink="/contributions" class="sidebar__link">
+          <a *ngIf="userRole === 'administrador_cultivo'" routerLink="/contributions" class="sidebar__link">
             <i class="ri-database-2-fill"></i>
-            <span *ngIf="!isSidebarCollapsed">Contribuciones</span>
+            <span *ngIf="!isSidebarCollapsed">Revisión de Contribuciones</span>
           </a>
-          <a routerLink="/users" class="sidebar__link">
-            <i class="ri-user-fill"></i>
-            <span *ngIf="!isSidebarCollapsed">Usuarios</span>
+          <a routerLink="/notifications" class="sidebar__link">
+            <i class="ri-notification-3-fill"></i>
+            <span *ngIf="!isSidebarCollapsed">Notificaciones</span>
+          </a>
+          <a routerLink="/tag-management" class="sidebar__link">
+            <i class="ri-price-tag-3-fill"></i>
+            <span *ngIf="!isSidebarCollapsed">Gestión de Etiquetas</span>
           </a>
         </div>
       </div>
     </div>
 
+    <!-- 🔒 ACCIONES GENERALES -->
     <div class="sidebar__actions">
-      <!-- Botón de Acerca de -->
       <button (click)="showAbout()" class="sidebar__link">
         <i class="ri-information-fill"></i>
         <span>Acerca de</span>
@@ -90,8 +101,9 @@
 </nav>
 
 <!-- Main Content -->
-<main
-  class="main container"
-  [ngClass]="{ 'left-pd': isSidebarCollapsed }"
-  id="main"
-></main>
+<!-- Main Content -->
+<main class="dashboard-container main container" [ngClass]="{ 'left-pd': isSidebarCollapsed }" id="main">
+  <!-- Aquí se renderizan las páginas hijas -->
+  <router-outlet></router-outlet>
+</main>
+
