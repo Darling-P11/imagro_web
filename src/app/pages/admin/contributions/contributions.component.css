@@ -213,3 +213,172 @@ tbody tr:hover {
   color: #555;
   font-family: 'Poppins', sans-serif;
 }
+
+
+/*MODAL*/
+/* 🌌 Fondo oscuro de la ventana emergente */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+/* 🗂️ Contenedor del modal con scroll y diseño mejorado */
+.modal-content {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+  max-height: 80vh; /* ✅ Limita el tamaño */
+  overflow-y: auto; /* 📜 Scroll interno */
+  width: 100%;
+  animation: fadeInModal 0.3s ease-in-out;
+  font-family: 'Poppins', sans-serif;
+
+  /* 🎨 Scrollbar moderna */
+  scrollbar-width: thin;
+  scrollbar-color: #0ba27f #e0e0e0;
+}
+
+/* 🎨 Estilo para scroll moderno en navegadores webkit */
+.modal-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+  background: #e0e0e0;
+  border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+  background-color: #0ba27f;
+  border-radius: 10px;
+  border: 2px solid #e0e0e0;
+}
+
+/* 🎬 Animación de entrada del modal */
+@keyframes fadeInModal {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 📋 Título principal fijo */
+/* 📋 Título principal fijo */
+.modal-content h2 {
+  text-align: center;
+  font-weight: bold;
+  margin: 0;
+  color: #333;
+  position: sticky;
+  top: 0;
+  background: #ffffff;
+  padding: 20px 0;
+  z-index: 10;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* ✅ Sombra sutil para mayor claridad */
+  border-radius: 15px 15px 0 0; /* ✅ Bordes superiores redondeados */
+}
+
+/* 🌿 Contenedor de cada cultivo */
+.cultivo-container {
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+.cultivo-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* ➖ Línea divisoria blanca debajo del nombre del cultivo */
+.cultivo-title {
+  color: #0ba27f;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.cultivo-title::before {
+  content: "🌿";
+  margin-right: 8px;
+}
+
+.cultivo-title::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #ffffff;
+  border-radius: 1px;
+}
+
+/* ✅ Estado del cultivo */
+.estado {
+  font-weight: bold;
+  color: #0ba27f;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.estado::before {
+  content: "✅";
+  margin-right: 5px;
+}
+
+/* ⚠️ Enfermedades */
+.enfermedades {
+  font-weight: bold;
+  color: #e67e22;
+  display: flex;
+  align-items: center;
+}
+
+.enfermedades::before {
+  content: "⚠️";
+  margin-right: 5px;
+}
+
+/* ❌ Botón de cerrar con tamaño adecuado y sombra */
+.close-modal {
+  background-color: #d9534f;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
+  width: auto;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.close-modal:hover {
+  background-color: #b52b27;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+}

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Firestore, collection, collectionData, doc, getDoc, getDocs, updateDoc } from '@angular/fire/firestore';
-import { Observable } from 'rxjs';
+import { Observable, from } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -65,4 +65,23 @@ export class ContributionService {
     const configRef = doc(this.firestore, `historialConfiguracion/${userId}/enviado/${configId}`);
     await updateDoc(configRef, { estado: newStatus });
   }
+
+  // ✅ Obtener la configuración específica de un usuario
+  getConfiguration(userId: string, configId: string): Observable<any> {
+    const configPath = `historialConfiguracion/${userId}/enviado/${configId}`;
+    const configDoc = doc(this.firestore, configPath);
+    return from(getDoc(configDoc).then((snapshot) => snapshot.data()));
+  }
+  // ✅ Obtener configuración específica desde Firestore
+getSpecificContribution(userId: string, configId: string): Observable<any> {
+  const configPath = `historialConfiguracion/${userId}/enviado/${configId}`;
+  const configDoc = doc(this.firestore, configPath);
+  return from(getDoc(configDoc).then((snapshot) => {
+    if (snapshot.exists()) {
+      return snapshot.data(); // ✅ Devuelve la configuración específica
+    } else {
+      throw new Error('Configuración no encontrada');
+    }
+  }));
+}
 }

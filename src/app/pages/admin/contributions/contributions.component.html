@@ -26,10 +26,13 @@
         <td>{{ contribution.configuracionCompleta.estado }}</td> <!-- ✅ Estado -->
         <td>{{ contribution.contributionDetails.cantidad_imagenes }}</td> <!-- ✅ Cantidad de imágenes -->
         <td>
-          <button class="config-btn" (click)="viewConfiguration(contribution)">
-            Ver Configuración
-          </button>
+          <!-- ✅ Botón para ver configuración específica -->
+<button class="config-btn" (click)="viewConfiguration(contribution)">
+  Ver Configuración
+</button>
+
         </td>
+        
         <td>
           <button class="action-button accept" (click)="updateStatus(contribution, 'aceptado')">Aceptar</button>
           <button class="action-button reject" (click)="updateStatus(contribution, 'rechazado')">Rechazar</button>
@@ -39,3 +42,26 @@
     </tbody>
   </table>
 </div>
+
+<!--  Modal de Configuración -->
+
+<div *ngIf="showModal" class="modal-overlay">
+  <div class="modal-content">
+    <h2>📋 Resumen de tu configuración</h2> <!-- ✅ Título fijo -->
+    <div *ngIf="selectedConfigData">
+      <div *ngFor="let cultivo of getCultivos(selectedConfigData)" class="cultivo-container">
+        <h3 class="cultivo-title">Cultivo: {{ cultivo }}</h3>
+        <div *ngFor="let tipo of getTiposCultivo(selectedConfigData[cultivo])">
+          <p class="tipo-cultivo">🏷️ {{ tipo }}</p>
+          <p class="estado">Estado: {{ selectedConfigData[cultivo][tipo].estado }}</p>
+          <p class="enfermedades">Enfermedades: 
+            {{ selectedConfigData[cultivo][tipo].enfermedades?.join(', ') || 'Sin enfermedades' }}
+          </p>
+        </div>
+      </div>
+    </div>
+    <button (click)="closeModal()" class="close-modal">Cerrar</button>
+  </div>
+</div>
+
+
