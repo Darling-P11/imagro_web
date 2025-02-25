@@ -1,12 +1,12 @@
-import { Injectable } from '@angular/core';
-import { Firestore, collection, collectionData, doc, getDoc, getDocs, updateDoc } from '@angular/fire/firestore';
+import { Injectable, inject } from '@angular/core';
+import { Firestore, collection, collectionData, doc, getDoc, getDocs, updateDoc, deleteDoc, setDoc } from '@angular/fire/firestore';
 import { Observable, from } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ContributionService {
-  constructor(private firestore: Firestore) {}
+  private firestore = inject(Firestore); // ✅ Inyección correcta de Firestore
 
   // 🔍 Obtener todas las configuraciones pendientes de todos los usuarios
   getPendingContributions(): Observable<any[]> {
@@ -60,28 +60,67 @@ export class ContributionService {
     });
   }
 
-  // 🔄 Actualizar el estado de una contribución
+  // 🔄 Actualizar el estado de una contribución a 'aceptado'
   async updateContributionStatus(userId: string, configId: string, newStatus: string): Promise<void> {
     const configRef = doc(this.firestore, `historialConfiguracion/${userId}/enviado/${configId}`);
     await updateDoc(configRef, { estado: newStatus });
   }
 
-  // ✅ Obtener la configuración específica de un usuario
-  getConfiguration(userId: string, configId: string): Observable<any> {
+  // ✅ Obtener configuración específica desde Firestore
+  getSpecificContribution(userId: string, configId: string): Observable<any> {
     const configPath = `historialConfiguracion/${userId}/enviado/${configId}`;
     const configDoc = doc(this.firestore, configPath);
-    return from(getDoc(configDoc).then((snapshot) => snapshot.data()));
+    return from(getDoc(configDoc).then((snapshot) => {
+      if (snapshot.exists()) {
+        return snapshot.data();
+      } else {
+        throw new Error('Configuración no encontrada');
+      }
+    }));
   }
-  // ✅ Obtener configuración específica desde Firestore
-getSpecificContribution(userId: string, configId: string): Observable<any> {
-  const configPath = `historialConfiguracion/${userId}/enviado/${configId}`;
-  const configDoc = doc(this.firestore, configPath);
-  return from(getDoc(configDoc).then((snapshot) => {
-    if (snapshot.exists()) {
-      return snapshot.data(); // ✅ Devuelve la configuración específica
-    } else {
-      throw new Error('Configuración no encontrada');
+
+  // 🔄 Mover contribución rechazada
+  // 🔄 Mover contribución y configuración a la colección rechazado
+  async rejectContribution(userId: string, contributionId: string, configId: string): Promise<void> {
+    try {
+      // 🔍 Referencias a los documentos originales
+      const contributionRef = doc(this.firestore, `historialContribuciones/${userId}/enviado/${contributionId}`);
+      const configRef = doc(this.firestore, `historialConfiguracion/${userId}/enviado/${configId}`);
+  
+      // 📥 Obtener los datos de los documentos
+      const contributionSnapshot = await getDoc(contributionRef);
+      const configSnapshot = await getDoc(configRef);
+  
+      if (contributionSnapshot.exists() && configSnapshot.exists()) {
+        let contributionData = contributionSnapshot.data();
+        let configData = configSnapshot.data();
+  
+        // ✅ Actualizar el estado y agregar la fecha de rechazo
+        const fechaRechazo = new Date().toISOString(); // Fecha en formato ISO
+        configData = {
+          ...configData,
+          estado: 'rechazado',
+          fecha_rechazo: fechaRechazo
+        };
+  
+        // ✅ Mover los documentos a la colección 'rechazado'
+        const rejectedContributionRef = doc(this.firestore, `historialContribuciones/${userId}/rechazado/${contributionId}`);
+        const rejectedConfigRef = doc(this.firestore, `historialConfiguracion/${userId}/rechazado/${configId}`);
+  
+        await setDoc(rejectedContributionRef, contributionData);
+        await setDoc(rejectedConfigRef, configData);
+  
+        // ❌ Eliminar los documentos de 'enviado'
+        await deleteDoc(contributionRef);
+        await deleteDoc(configRef);
+      } else {
+        throw new Error('Contribución o configuración no encontrada');
+      }
+    } catch (error) {
+      console.error('❌ Error al rechazar la contribución:', error);
+      throw error;
     }
-  }));
-}
+  }
+  
+  
 }

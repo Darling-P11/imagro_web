@@ -34,9 +34,32 @@
         </td>
         
         <td>
-          <button class="action-button accept" (click)="updateStatus(contribution, 'aceptado')">Aceptar</button>
-          <button class="action-button reject" (click)="updateStatus(contribution, 'rechazado')">Rechazar</button>
-          <button class="action-button view" (click)="selectContribution(contribution)">Visualizar</button>
+          <button
+            class="action-button accept"
+            [disabled]="rejectingContributionId !== null" 
+            (click)="updateStatus(contribution, 'aceptado')"
+          >
+            Aceptar
+          </button>
+        
+          <button
+            class="action-button reject"
+            [disabled]="rejectingContributionId === contribution.id"
+            (click)="updateStatus(contribution, 'rechazado')"
+          >
+            <ng-container *ngIf="rejectingContributionId === contribution.id; else normalReject">
+              <div class="button-spinner"></div> Rechazando...
+            </ng-container>
+            <ng-template #normalReject>Rechazar</ng-template>
+          </button>
+        
+          <button
+            class="action-button view"
+            [disabled]="rejectingContributionId !== null"
+            (click)="selectContribution(contribution)"
+          >
+            Visualizar
+          </button>
         </td>
       </tr>
     </tbody>
