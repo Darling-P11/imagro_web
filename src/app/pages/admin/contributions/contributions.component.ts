@@ -17,7 +17,13 @@ export class ContributionsComponent implements OnInit {
   showModal: boolean = false;
   selectedConfigData: any = null;
   isModalVisible: boolean = false;
-  rejectingContributionId: string | null = null; // ✅ Estado de rechazo por contribución
+  rejectingContributionId: string | null = null; // ID de la contribución que está en proceso
+currentAction: 'rechazado' | 'aceptado' | null = null; // Estado actual de la acción
+selectedImages: any[] = []; // ✅ Lista de imágenes seleccionadas
+isVisualizeModalVisible: boolean = false; // ✅ Control del modal de visualización
+
+
+  
 
   constructor(private contributionService: ContributionService) {}
 
@@ -38,46 +44,40 @@ export class ContributionsComponent implements OnInit {
     this.selectedContribution = contribution;
   }
 
-  // ✅ Actualizar estado de una contribución (aceptar o rechazar)
-  // ✅ Actualizar estado de una contribución (aceptar o rechazar) con mensajes de confirmación
 // ✅ Actualizar estado de una contribución (aceptar o rechazar)
 async updateStatus(contribution: any, status: string): Promise<void> {
-  if (status === 'rechazado') {
-    this.rejectingContributionId = contribution.id; // ✅ Activar el loading específico
+  this.rejectingContributionId = contribution.id; // ✅ Activar el loading específico
+  this.currentAction = status as 'rechazado' | 'aceptado'; // ✅ Forzar el tipo esperado
 
-    try {
-      const contributionId = contribution.configuracionCompleta.contribucion_id;
 
+  try {
+    const contributionId = contribution.configuracionCompleta.contribucion_id;
+
+    if (status === 'rechazado') {
       await this.contributionService.rejectContribution(
         contribution.usuarioId,
         contributionId,
         contribution.id
       );
-
-      // 🔄 Esperar a que la tabla se actualice antes de finalizar el loading
-      await this.loadPendingContributions();
-    } catch (error) {
-      console.error('❌ Error al rechazar la contribución:', error);
-    } finally {
-      this.rejectingContributionId = null; // ✅ Desactivar el loading después de actualizar la tabla
-    }
-  } else if (status === 'aceptado') {
-    this.rejectingContributionId = contribution.id; // ✅ Activar el loading para aceptar también
-
-    try {
-      await this.contributionService.updateContributionStatus(
+    } else if (status === 'aceptado') {
+      await this.contributionService.acceptContribution(
         contribution.usuarioId,
-        contribution.id,
-        status
+        contributionId,
+        contribution.id
       );
-      await this.loadPendingContributions();
-    } catch (error) {
-      console.error('❌ Error al aceptar la contribución:', error);
-    } finally {
-      this.rejectingContributionId = null; // ✅ Desactivar el loading después de actualizar
     }
+
+    // 🔄 Esperar a que la tabla se actualice antes de finalizar el loading
+    await this.loadPendingContributions();
+  } catch (error) {
+    console.error(`❌ Error al actualizar el estado a ${status}:`, error);
+  } finally {
+    this.rejectingContributionId = null; // ✅ Desactivar el loading
+    this.currentAction = null; // ✅ Resetear el estado
   }
 }
+
+
 
 
 
@@ -91,6 +91,66 @@ async updateStatus(contribution: any, status: string): Promise<void> {
         console.error('Error al obtener la configuración:', error);
       });
   }
+
+  // ✅ Visualizar imágenes de la contribución seleccionada
+viewContribution(contribution: any): void {
+  const images = contribution.contributionDetails.imagenes;
+
+  if (images && images.length > 0) {
+    this.selectedImages = images; // ✅ Guardar las imágenes
+    this.isVisualizeModalVisible = true; // ✅ Mostrar el modal de visualización
+  } else {
+    console.warn('No hay imágenes disponibles para esta contribución.');
+  }
+}
+// ✅ Obtener cultivos únicos de las imágenes
+getCultivosFromImages(): string[] {
+  const cultivos = this.selectedImages.map((img) => img.cultivo);
+  return [...new Set(cultivos)]; // Eliminar duplicados
+}
+
+// ✅ Obtener tipos únicos por cultivo
+getTiposFromImages(cultivo: string): string[] {
+  const tipos = this.selectedImages
+    .filter((img) => img.cultivo === cultivo)
+    .map((img) => img.tipo);
+  return [...new Set(tipos)];
+}
+
+// ✅ Filtrar imágenes por cultivo y tipo
+filterImagesByCultivoAndTipo(cultivo: string, tipo: string): any[] {
+  return this.selectedImages.filter((img) => img.cultivo === cultivo && img.tipo === tipo);
+}
+// ✅ Obtener estados únicos por cultivo y tipo
+getEstadosFromImages(cultivo: string, tipo: string): string[] {
+  const estados = this.selectedImages
+    .filter((img) => img.cultivo === cultivo && img.tipo === tipo)
+    .map((img) => img.estado);
+  return [...new Set(estados)];
+}
+
+// ✅ Obtener enfermedades únicas por cultivo, tipo y estado
+getEnfermedadesFromImages(cultivo: string, tipo: string, estado: string): string[] {
+  const enfermedades = this.selectedImages
+    .filter((img) => img.cultivo === cultivo && img.tipo === tipo && img.estado === estado)
+    .map((img) => img.enfermedad);
+  return [...new Set(enfermedades)];
+}
+
+// ✅ Filtrar imágenes por cultivo, tipo, estado y enfermedad
+filterImagesByCompleteCriteria(cultivo: string, tipo: string, estado: string, enfermedad: string): any[] {
+  return this.selectedImages.filter(
+    (img) => img.cultivo === cultivo && img.tipo === tipo && img.estado === estado && img.enfermedad === enfermedad
+  );
+}
+
+
+
+// ✅ Cerrar el modal de visualización
+closeVisualizeModal(): void {
+  this.isVisualizeModalVisible = false;
+}
+
 
   // ❌ Cerrar el modal
   closeModal(): void {

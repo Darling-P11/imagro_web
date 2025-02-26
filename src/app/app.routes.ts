@@ -7,14 +7,15 @@ import { HomeComponent } from './pages/home/home.component';
 import { AuthGuard } from './guards/auth.guard';
 import { RedirectIfLoggedInGuard } from './guards/redirect-if-logged-in.guard';
 import { ContributionsComponent } from './pages/admin/contributions/contributions.component';
-
-
+import { DefaultComponent } from './pages/dashboard/default/default.component';
+import { DatasetsComponent } from './pages/dashboard/datasets/datasets.component';
+import { GenerateModelsComponent } from './pages/dashboard/generate-models/generate-models.component';
+import { GeoreferenceComponent } from './pages/dashboard/georeference/georeference.component';
+import { TagManagementComponent } from './pages/admin/tag-management/tag-management.component';
 
 export const routes: Routes = [
-  // Mostrar Home en la ruta raíz, redirigir si el usuario está logueado
+  // Página de inicio y autenticación
   { path: '', component: HomeComponent, canActivate: [RedirectIfLoggedInGuard] },
-
-  // Rutas de autenticación
   {
     path: 'login',
     loadComponent: () => import('./pages/auth/login/login.component').then(m => m.LoginComponent),
@@ -29,9 +30,15 @@ export const routes: Routes = [
     component: DashboardComponent,
     canActivate: [AuthGuard],
     children: [
-      { path: '', redirectTo: 'contributions', pathMatch: 'full' }, // Ruta por defecto
+      { path: '', redirectTo: 'default', pathMatch: 'full' }, // Redirección a Inicio
+      { path: 'default', component: DefaultComponent, canActivate: [AuthGuard] },
+      { path: 'datasets', component: DatasetsComponent, canActivate: [AuthGuard] },
+      { path: 'generate-models', component: GenerateModelsComponent, canActivate: [AuthGuard] },
+      { path: 'georeference', component: GeoreferenceComponent, canActivate: [AuthGuard] },
+      
+      // Rutas exclusivas para administradores
       { path: 'contributions', component: ContributionsComponent, canActivate: [AuthGuard] },
-      // Aquí puedes agregar más rutas anidadas si es necesario
+      { path: 'tag-management', component: TagManagementComponent, canActivate: [AuthGuard] },
     ]
   },
 

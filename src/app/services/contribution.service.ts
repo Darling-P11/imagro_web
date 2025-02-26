@@ -67,12 +67,13 @@ export class ContributionService {
   }
 
   // ✅ Obtener configuración específica desde Firestore
+  // 🔍 Obtener configuración específica de una contribución
   getSpecificContribution(userId: string, configId: string): Observable<any> {
     const configPath = `historialConfiguracion/${userId}/enviado/${configId}`;
     const configDoc = doc(this.firestore, configPath);
     return from(getDoc(configDoc).then((snapshot) => {
       if (snapshot.exists()) {
-        return snapshot.data();
+        return snapshot.data(); // ✅ Devuelve la configuración específica
       } else {
         throw new Error('Configuración no encontrada');
       }
@@ -121,6 +122,50 @@ export class ContributionService {
       throw error;
     }
   }
+//ACEPTACION DE LA CONTRIBUCION
+  async acceptContribution(userId: string, contributionId: string, configId: string): Promise<void> {
+    try {
+      // 🔍 Referencias a los documentos originales
+      const contributionRef = doc(this.firestore, `historialContribuciones/${userId}/enviado/${contributionId}`);
+      const configRef = doc(this.firestore, `historialConfiguracion/${userId}/enviado/${configId}`);
+  
+      // 📥 Obtener los datos de los documentos
+      const contributionSnapshot = await getDoc(contributionRef);
+      const configSnapshot = await getDoc(configRef);
+  
+      if (contributionSnapshot.exists() && configSnapshot.exists()) {
+        let contributionData = contributionSnapshot.data();
+        let configData = configSnapshot.data();
+  
+        // ✅ Actualizar el estado y agregar la fecha de aceptación
+        const fechaAceptacion = new Date().toISOString(); // Fecha en formato ISO
+        configData = {
+          ...configData,
+          estado: 'aceptado',
+          fecha_aceptacion: fechaAceptacion
+        };
+  
+        // ✅ Mover los documentos a la colección 'aceptado'
+        const acceptedContributionRef = doc(this.firestore, `historialContribuciones/${userId}/aceptado/${contributionId}`);
+        const acceptedConfigRef = doc(this.firestore, `historialConfiguracion/${userId}/aceptado/${configId}`);
+  
+        await setDoc(acceptedContributionRef, contributionData);
+        await setDoc(acceptedConfigRef, configData);
+  
+        // ❌ Eliminar los documentos de 'enviado'
+        await deleteDoc(contributionRef);
+        await deleteDoc(configRef);
+      } else {
+        throw new Error('Contribución o configuración no encontrada');
+      }
+    } catch (error) {
+      console.error('❌ Error al aceptar la contribución:', error);
+      throw error;
+    }
+  }
+
+
+  //RECHAZO DE IMAGEN Y RESTRUCTURACION EN FIRESTOREGE
   
   
 }

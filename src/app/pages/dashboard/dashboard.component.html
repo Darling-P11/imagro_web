@@ -20,17 +20,13 @@
 </header>
 
 <!-- Sidebar -->
-<nav
-  class="sidebar"
-  [ngClass]="{ 'show-sidebar': isSidebarCollapsed }"
-  id="sidebar"
->
+<!-- Sidebar -->
+<nav class="sidebar" [ngClass]="{ 'show-sidebar': isSidebarCollapsed }" id="sidebar">
   <div class="sidebar__container">
     <div class="sidebar__user">
       <div class="sidebar__img">
         <img [src]="userPhoto" alt="image" />
       </div>
-
       <div class="sidebar__info">
         <h3 class="user-name">{{ userName }}</h3>
         <span class="user-email">{{ userEmail }}</span>
@@ -41,27 +37,34 @@
     <div class="sidebar__content">
       <!-- 🔓 MÓDULOS PARA USUARIO NORMAL Y ADMINISTRADOR DE CULTIVO -->
       <div *ngIf="isUsuario() || isAdminCultivo()">
-        <h3 class="sidebar__title">MANAGE</h3>
+        <h3 class="sidebar__title">MODULOS</h3>
         <div class="sidebar__list">
-          <a routerLink="/dashboard" class="sidebar__link active-link">
+          <a routerLink="/dashboard/default" 
+             class="sidebar__link" 
+             routerLinkActive="active-link">
             <i class="ri-pie-chart-2-fill"></i>
             <span *ngIf="!isSidebarCollapsed">Inicio</span>
           </a>
-          <a routerLink="/datasets" class="sidebar__link">
+
+          <a routerLink="/dashboard/datasets" 
+             class="sidebar__link" 
+             routerLinkActive="active-link">
             <i class="ri-image-fill"></i>
             <span *ngIf="!isSidebarCollapsed">Datasets</span>
           </a>
-          <a routerLink="/generate-models" class="sidebar__link">
+
+          <a routerLink="/dashboard/generate-models" 
+             class="sidebar__link" 
+             routerLinkActive="active-link">
             <i class="ri-bar-chart-box-fill"></i>
-            <span *ngIf="!isSidebarCollapsed">Generar Modelos</span>
+            <span *ngIf="!isSidebarCollapsed">Generar modelos</span>
           </a>
-          <a routerLink="/profile" class="sidebar__link">
-            <i class="ri-user-3-fill"></i>
-            <span *ngIf="!isSidebarCollapsed">Perfil</span>
-          </a>
-          <a routerLink="/contributions" class="sidebar__link">
-            <i class="ri-file-list-fill"></i>
-            <span *ngIf="!isSidebarCollapsed">Contribuciones</span>
+
+          <a routerLink="/dashboard/profile" 
+             class="sidebar__link" 
+             routerLinkActive="active-link">
+            <i class="ri-road-map-line"></i>
+            <span *ngIf="!isSidebarCollapsed">Georreferencias</span>
           </a>
         </div>
       </div>
@@ -70,17 +73,19 @@
       <div *ngIf="isAdminCultivo()">
         <h3 class="sidebar__title">ADMIN TOOLS</h3>
         <div class="sidebar__list">
-          <a *ngIf="userRole === 'administrador_cultivo'" routerLink="/contributions" class="sidebar__link">
+          <a *ngIf="userRole === 'administrador_cultivo'" 
+             routerLink="/dashboard/contributions" 
+             class="sidebar__link" 
+             routerLinkActive="active-link">
             <i class="ri-database-2-fill"></i>
-            <span *ngIf="!isSidebarCollapsed">Revisión de Contribuciones</span>
+            <span *ngIf="!isSidebarCollapsed">Revisión de contribuciones</span>
           </a>
-          <a routerLink="/notifications" class="sidebar__link">
-            <i class="ri-notification-3-fill"></i>
-            <span *ngIf="!isSidebarCollapsed">Notificaciones</span>
-          </a>
-          <a routerLink="/tag-management" class="sidebar__link">
+
+          <a routerLink="/dashboard/tag-management" 
+             class="sidebar__link" 
+             routerLinkActive="active-link">
             <i class="ri-price-tag-3-fill"></i>
-            <span *ngIf="!isSidebarCollapsed">Gestión de Etiquetas</span>
+            <span *ngIf="!isSidebarCollapsed">Gestión de etiquetas</span>
           </a>
         </div>
       </div>

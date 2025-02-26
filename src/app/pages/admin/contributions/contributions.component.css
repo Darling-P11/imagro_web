@@ -402,3 +402,167 @@ tbody tr:hover {
     transform: rotate(360deg);
   }
 }
+
+/* DISEÑOS PARA LA MODAL DE IMAGENES */
+/* ✅ Modal más grande y claro */
+/* ✅ Modal más grande y elegante */
+.modal-content-large {
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  max-width: 85%;
+  max-height: 90vh;
+  overflow-y: auto;
+  width: 100%;
+  font-family: 'Poppins', sans-serif;
+  position: relative;
+}
+
+/* ✅ Título centrado y destacado */
+.modal-content-large h2 {
+  text-align: center;
+  font-weight: bold;
+  font-size: 1.8rem;
+  color: #0ba27f;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #0ba27f;
+  padding-bottom: 10px;
+}
+
+/* ✅ Botón de cerrar en la esquina superior derecha */
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background-color: transparent;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  color: #0ba27f;
+  transition: color 0.3s ease;
+}
+
+.close-button:hover {
+  color: #d9534f;
+}
+
+/* ✅ Contenedores claros con mejor visibilidad */
+.cultivo-section {
+  background-color: #e6fff2;
+  padding: 25px;
+  border-radius: 15px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.tipo-section {
+  background-color: #f0fdf4;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.estado-section {
+  background-color: #d1fae5;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.enfermedad-section {
+  background-color: #bbf7d0;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+/* ✅ Encabezados con mejor visibilidad */
+.cultivo-section h3,
+.tipo-section h4,
+.estado-section h5,
+.enfermedad-section h6 {
+  margin: 10px 0;
+  font-weight: bold;
+  color: #0ba27f;
+  text-transform: capitalize;
+}
+
+/* ✅ Mosaico de imágenes */
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-top: 10px;
+}
+
+/* ✅ Hover en imágenes */
+.image-preview-grid {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.image-preview-grid:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* ✅ Barra de desplazamiento moderna */
+.modal-content-large::-webkit-scrollbar {
+  width: 10px;
+}
+
+.modal-content-large::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.modal-content-large::-webkit-scrollbar-thumb {
+  background: #0ba27f;
+  border-radius: 10px;
+  border: 2px solid #f1f1f1;
+}
+
+.modal-content-large::-webkit-scrollbar-thumb:hover {
+  background: #088a66;
+}
+
+/* ✅ Botón de cerrar (estilo mejorado) */
+.close-modal {
+  background-color: #d9534f;
+  color: #fff;
+  padding: 12px 25px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  margin-top: 20px;
+  font-weight: bold;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.close-modal:hover {
+  background-color: #b52b27;
+  transform: translateY(-2px);
+}
+/* ✅ Mosaico de imágenes */
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* ✅ Diseño responsivo */
+  gap: 10px;
+}
+
+/* ✅ Tamaño de las imágenes en el mosaico */
+.image-preview-grid {
+  width: 100%;
+  height: 150px;
+  object-fit: cover; /* ✅ Ajuste de imagen sin deformación */
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}

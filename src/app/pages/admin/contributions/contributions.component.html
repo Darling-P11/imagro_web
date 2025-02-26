@@ -27,39 +27,42 @@
         <td>{{ contribution.contributionDetails.cantidad_imagenes }}</td> <!-- ✅ Cantidad de imágenes -->
         <td>
           <!-- ✅ Botón para ver configuración específica -->
-<button class="config-btn" (click)="viewConfiguration(contribution)">
-  Ver Configuración
-</button>
-
+          <button class="config-btn" (click)="viewConfiguration(contribution)">
+            Ver Configuración
+          </button>
         </td>
-        
         <td>
           <button
-            class="action-button accept"
-            [disabled]="rejectingContributionId !== null" 
-            (click)="updateStatus(contribution, 'aceptado')"
-          >
-            Aceptar
-          </button>
-        
-          <button
-            class="action-button reject"
-            [disabled]="rejectingContributionId === contribution.id"
-            (click)="updateStatus(contribution, 'rechazado')"
-          >
-            <ng-container *ngIf="rejectingContributionId === contribution.id; else normalReject">
-              <div class="button-spinner"></div> Rechazando...
-            </ng-container>
-            <ng-template #normalReject>Rechazar</ng-template>
-          </button>
-        
-          <button
-            class="action-button view"
-            [disabled]="rejectingContributionId !== null"
-            (click)="selectContribution(contribution)"
-          >
-            Visualizar
-          </button>
+  class="action-button accept"
+  [disabled]="rejectingContributionId === contribution.id"
+  (click)="updateStatus(contribution, 'aceptado')"
+>
+  <ng-container *ngIf="rejectingContributionId === contribution.id && currentAction === 'aceptado'; else normalAccept">
+    <div class="button-spinner"></div> Aceptando...
+  </ng-container>
+  <ng-template #normalAccept>Aceptar</ng-template>
+</button>
+
+<button
+  class="action-button reject"
+  [disabled]="rejectingContributionId === contribution.id"
+  (click)="updateStatus(contribution, 'rechazado')"
+>
+  <ng-container *ngIf="rejectingContributionId === contribution.id && currentAction === 'rechazado'; else normalReject">
+    <div class="button-spinner"></div> Rechazando...
+  </ng-container>
+  <ng-template #normalReject>Rechazar</ng-template>
+</button>
+
+
+<button
+class="action-button view"
+[disabled]="rejectingContributionId !== null"
+(click)="viewContribution(contribution)"
+>
+Visualizar
+</button>
+
         </td>
       </tr>
     </tbody>
@@ -67,7 +70,6 @@
 </div>
 
 <!--  Modal de Configuración -->
-
 <div *ngIf="showModal" class="modal-overlay">
   <div class="modal-content">
     <h2>📋 Resumen de tu configuración</h2> <!-- ✅ Título fijo -->
@@ -86,5 +88,46 @@
     <button (click)="closeModal()" class="close-modal">Cerrar</button>
   </div>
 </div>
+
+<!-- ✅ Modal de Visualización de Imágenes -->
+
+<div *ngIf="isVisualizeModalVisible" class="modal-overlay">
+  <div class="modal-content-large">
+    <!-- ✅ Botón de cerrar -->
+    <button class="close-button" (click)="closeVisualizeModal()">❌</button>
+
+    <!-- ✅ Título centrado -->
+    <h2>🖼️ Visualización de Imágenes</h2>
+
+    <!-- ✅ Secciones organizadas -->
+    <div *ngFor="let cultivo of getCultivosFromImages()" class="cultivo-section">
+      <h3>{{ cultivo }}</h3>
+
+      <div *ngFor="let tipo of getTiposFromImages(cultivo)" class="tipo-section">
+        <h4>Tipo: {{ tipo }}</h4>
+
+        <div *ngFor="let estado of getEstadosFromImages(cultivo, tipo)" class="estado-section">
+          <h5>Estado: {{ estado }}</h5>
+
+          <div *ngFor="let enfermedad of getEnfermedadesFromImages(cultivo, tipo, estado)" class="enfermedad-section">
+            <h6>Enfermedad: {{ enfermedad }}</h6>
+
+            <!-- ✅ Mosaico de imágenes -->
+            <div class="image-grid">
+              <img *ngFor="let img of filterImagesByCompleteCriteria(cultivo, tipo, estado, enfermedad)" 
+                   [src]="img.url" 
+                   alt="Imagen de contribución" 
+                   class="image-preview-grid"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ Botón de cerrar en la parte inferior -->
+    <button (click)="closeVisualizeModal()" class="close-modal">Cerrar</button>
+  </div>
+</div>
+
 
 
