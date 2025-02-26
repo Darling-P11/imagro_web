@@ -1,0 +1,217 @@
+/* ✅ Aplicamos la fuente Montserrat/Poppins */
+* {
+  font-family: 'Poppins', 'Montserrat', sans-serif;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 🔹 Contenedor Principal */
+.tag-management-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #ffffff;
+  position: relative;
+}
+
+/* 🔹 Tarjeta de Configuración */
+.tag-management-card {
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 420px;
+  z-index: 2;
+  position: relative;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+/* 🔹 Título */
+h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #0ba27f;
+  margin-bottom: 1.5rem;
+}
+
+/* 🔹 Grupos de Formulario */
+.form-group {
+  margin-bottom: 15px;
+  text-align: left;
+}
+
+/* 🔹 Labels */
+label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+/* 🔹 Input y Select */
+input, select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ✅ Input con animación al hacer hover */
+input:hover, select:hover {
+  border-color: #0ba27f;
+  box-shadow: 0 0 8px rgba(11, 162, 127, 0.4);
+}
+
+/* ✅ Input con animación al hacer focus */
+input:focus, select:focus {
+  border-color: #0ba27f;
+  box-shadow: 0 0 12px rgba(11, 162, 127, 0.5);
+  outline: none;
+}
+
+/* 🔹 Contenedor de input con botón (+) */
+.input-group {
+  display: flex;
+  align-items: center;
+}
+
+.input-group input {
+  flex: 1;
+}
+
+/* 🔹 Botón Guardar */
+.btn-save {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 10px;
+  background: #0ba27f;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* ✅ Efecto de elevación al pasar el mouse */
+.btn-save:hover {
+  background: #088a66;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* ✅ Deshabilitar botón si el formulario es inválido */
+.btn-save:disabled {
+  background: gray;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* 🔹 Botones de Añadir y Eliminar */
+.btn-add {
+  background: #0ba27f;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  margin-left: 10px;
+}
+
+/* ✅ Efecto de elevación en botones */
+.btn-add:hover, .btn-delete:hover {
+  transform: scale(1.1);
+}
+
+/* 🔹 Botón de eliminar */
+.btn-delete {
+  background: red;
+  color: white;
+  border: none;
+  padding: 5px 8px;
+  border-radius: 5px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-delete:hover {
+  background: darkred;
+}
+
+/* 🔹 Lista de Elementos en Chips */
+.chip-list {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.chip {
+  background: #0ba27f;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 15px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  margin: 5px;
+}
+
+/* ✅ Animación de entrada y salida */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ✅ Feedback de carga */
+.loading-spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #0ba27f;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid #0ba27f;
+  border-top: 3px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ✅ Mensaje de éxito */
+.success-message {
+  color: #0ba27f;
+  background: #e6ffe6;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+  animation: fadeIn 0.3s ease-in-out;
+}

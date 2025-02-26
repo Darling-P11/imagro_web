@@ -1,1 +1,67 @@
-<p>tag-management works!</p>
+<div class="tag-management-container">
+  <div class="tag-management-card">
+    <h2>Registrar nuevo cultivo</h2>
+
+    <form (ngSubmit)="guardarConfiguracion()">
+      <!-- Cultivo -->
+      <div class="form-group">
+        <label for="cultivo">Cultivo:</label>
+        <input id="cultivo" type="text" [(ngModel)]="cultivoSeleccionado" name="cultivo" placeholder="Ingrese el nombre del cultivo">
+      </div>
+
+      <!-- Tipos de Cultivo -->
+      <div class="form-group">
+        <label for="tipo">Tipos de Cultivo:</label>
+        <div class="input-group">
+          <input id="tipo" type="text" [(ngModel)]="tipoTemporal" name="tipo" placeholder="Ingrese un tipo de cultivo">
+          <button type="button" class="btn-add" (click)="agregarTipo()">+</button>
+        </div>
+        <ul class="chip-list">
+          <li *ngFor="let tipo of tiposCultivo" class="chip">
+            {{ tipo }} <button type="button" class="btn-delete" (click)="eliminarTipo(tipo)">❌</button>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Estado -->
+      <div class="form-group">
+        <label for="estado">Estado:</label>
+        <select id="estado" [(ngModel)]="estadoSeleccionado" name="estado" (change)="verificarEstado()">
+          <option *ngFor="let estado of estados" [value]="estado">{{ estado }}</option>
+        </select>
+      </div>
+
+      <!-- Enfermedades -->
+      <div class="form-group" *ngIf="estadoSeleccionado === 'Enfermo'">
+        <label for="enfermedad">Enfermedades:</label>
+        <div class="input-group">
+          <input id="enfermedad" type="text" [(ngModel)]="enfermedadTemporal" name="enfermedad" placeholder="Ingrese una enfermedad">
+          <button type="button" class="btn-add" (click)="agregarEnfermedad()">+</button>
+        </div>
+        <ul class="chip-list">
+          <li *ngFor="let enfermedad of enfermedadesSeleccionadas" class="chip">
+            {{ enfermedad }} <button type="button" class="btn-delete" (click)="eliminarEnfermedad(enfermedad)">❌</button>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Feedback de carga -->
+      <div *ngIf="cargando" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Guardando información...</p>
+      </div>
+
+      <!-- Mensaje de éxito -->
+      <div *ngIf="mensajeExito" class="success-message">
+        ✅ {{ mensajeExito }}
+      </div>
+
+      <!-- 🔹 Botón Guardar -->
+      <div class="form-group">
+        <button type="submit" [disabled]="cargando || !cultivoSeleccionado || tiposCultivo.length === 0 || !estadoSeleccionado" class="btn-save">
+          Guardar Configuración
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

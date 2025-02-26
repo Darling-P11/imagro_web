@@ -1,1 +1,79 @@
-<p>default works!</p>
+<div class="dashboard-default">
+    <h2>👋 Bienvenido, {{ userName }}!</h2>
+    <p>Rol: <strong>{{ getFormattedRole() }}</strong></p>
+  
+    <!-- 🔹 DATOS DEL USUARIO -->
+    <div class="section-container">
+      <h3 class="section-title">📊 Tus Datos</h3>
+      <div class="dashboard-stats">
+        <div class="stat-card">
+          <i class="ri-hourglass-fill"></i>
+          <div>
+            <h3>{{ pendingContributions }}</h3>
+            <p>Contribuciones Pendientes</p>
+          </div>
+        </div>
+  
+        <div class="stat-card">
+          <i class="ri-check-fill"></i>
+          <div>
+            <h3>{{ approvedContributions }}</h3>
+            <p>Contribuciones Aprobadas</p>
+          </div>
+        </div>
+  
+        <div class="stat-card">
+          <i class="ri-close-fill"></i>
+          <div>
+            <h3>{{ rejectedContributions }}</h3>
+            <p>Contribuciones Rechazadas</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- 🔸 LÍNEA DIVISORIA -->
+    <hr class="divider">
+  
+    <!-- 🔹 DATOS DE IMAGRO -->
+    <div class="section-container">
+      <h3 class="section-title">🌍 Datos de Imagro</h3>
+      <div class="dashboard-stats">
+        <div class="stat-card">
+          <i class="ri-database-2-fill"></i>
+          <div>
+            <h3>{{ totalContributions }}</h3>
+            <p>Total Contribuciones en Imagro</p>
+          </div>
+        </div>
+  
+        <div class="stat-card">
+          <i class="ri-user-fill"></i>
+          <div>
+            <h3>{{ totalUsers }}</h3>
+            <p>Usuarios Registrados</p>
+          </div>
+        </div>
+  
+        <div class="stat-card">
+          <i class="ri-bar-chart-fill"></i>
+          <div>
+            <h3>{{ totalModels }}</h3>
+            <p>Modelos Generados</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <!-- 🔹 ACCESOS RÁPIDOS -->
+    <div class="quick-actions">
+      <h3>Accesos Rápidos</h3>
+      <div class="actions">
+        <a routerLink="/dashboard/datasets" class="action-button">📂 Ver Datasets</a>
+        <a routerLink="/dashboard/generate-models" class="action-button">📈 Generar Modelo</a>
+        <a routerLink="/dashboard/profile" class="action-button">🌍 Georreferencias</a>
+        <a *ngIf="isAdminCultivo()" routerLink="/dashboard/contributions" class="action-button">📋 Revisar Contribuciones</a>
+      </div>
+    </div>
+  </div>
+  
