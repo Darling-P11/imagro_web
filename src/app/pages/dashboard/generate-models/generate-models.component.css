@@ -1,0 +1,67 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f4f4;
+  margin: 0;
+  padding: 20px;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  font-size: 24px;
+  color: #333;
+}
+
+p {
+  color: #666;
+}
+
+.download-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.download-btn:hover {
+  background-color: #0056b3;
+}
+
+.directory {
+  margin-top: 20px;
+}
+
+.folders {
+  display: flex;
+  gap: 10px;
+}
+
+.folder {
+  background-color: #e7f1ff;
+  border: 1px solid #007bff;
+  border-radius: 5px;
+  padding: 10px;
+  flex: 1;
+}
+
+.data-explorer {
+  margin-top: 20px;
+}
+
+.summary {
+  margin-top: 20px;
+}

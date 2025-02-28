@@ -1,0 +1,228 @@
+/* 🔹 Contenedor Principal */
+.datasets-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 0;
+}
+/* 🔹 Asegurar que `dataset-content` se mantenga en una fila */
+.dataset-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start; /* Alineación superior */
+  gap: 20px;
+}
+
+/* 🔹 Tarjeta Principal */
+.dataset-card {
+  overflow-x: auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+  width: 100%;
+  max-width: calc(100% - 0px); /* ✅ Se ajusta al mismo ancho que el encabezado */
+}
+
+
+
+/* 🔹 Encabezado del Dataset */
+.dataset-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dataset-title h2 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #3d3d3d;
+  text-align: left;
+}
+
+.dataset-title p {
+  font-size: 1rem;
+  color: #666;
+  margin-top: 5px;
+  text-align: left;
+}
+
+/* 🔹 Botón de descarga */
+.btn-download {
+  background: black;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-download:hover {
+  background: #333;
+}
+
+/* 🔹 Línea Divisoria */
+.divider {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 15px 0;
+}
+
+/* 🔹 Ruta Actual */
+.dataset-path {
+  font-size: 1rem;
+  color: #3d3d3d;
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+.ruta-actual {
+  font-weight: bold;
+  color: #0ba27f;
+}
+
+/* 🔹 Contenido Principal */
+.dataset-content {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+/* 🔹 Sección de Carpetas */
+.dataset-folders {
+  flex: 2;
+  text-align: left;
+}
+
+.folders-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.folder-card {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  width: 180px;
+}
+
+.folder-card:hover {
+  transform: scale(1.05);
+}
+
+.folder-card img {
+  width: 60px;
+}
+
+.folder-card p {
+  font-weight: bold;
+  color: #333;
+}
+
+/* 🔹 Explorador de Datos y Resumen */
+.dataset-sidebar {
+  width: 30%;
+  text-align: left;
+  border-left: 1px solid #ddd;
+  padding-left: 20px;
+}
+
+.file-tree {
+  list-style: none;
+  padding-left: 0;
+}
+
+.file-tree li {
+  margin-top: 5px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.file-tree ul {
+  margin-left: 15px;
+  font-weight: normal;
+  padding-left: 10px;
+  border-left: 1px solid #ddd;
+}
+
+.file-tree label {
+  display: flex;
+  align-items: center;
+}
+
+.file-tree input[type="checkbox"] {
+  margin-right: 5px;
+}
+
+.carpeta-navegable {
+  cursor: pointer;
+  color: #0ba27f;
+  transition: color 0.2s ease;
+}
+
+.carpeta-navegable:hover {
+  color: #088a66;
+}
+
+/* 🔹 Sección de Imágenes */
+/* 🔹 Sección de Imágenes */
+.imagenes-container {
+  width: 100%;
+  padding: 10px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-sizing: border-box;
+}
+
+/* 🔹 Ajustar la cuadrícula para que se acomode en el espacio disponible */
+.imagenes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+/* 🔹 Ajuste para cada tarjeta de imagen */
+.imagen-card {
+  background: #ffffff;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+.imagen-card img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+  max-height: 130px;
+}
+
+.imagen-card p {
+  font-size: 0.9rem;
+  color: #333;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 🔹 Explorador de datos alineado con las imágenes */
+.dataset-sidebar {
+  width: 30%;
+  min-width: 250px;
+  box-sizing: border-box;
+}
+

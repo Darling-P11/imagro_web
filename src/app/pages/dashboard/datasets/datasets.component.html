@@ -1,1 +1,105 @@
-<p>datasets works!</p>
+<div class="datasets-container">
+  <div class="dataset-card">
+    <!-- 🔹 Encabezado del Dataset -->
+    <div class="dataset-header">
+      <div class="dataset-title">
+        <h2>Dataset de Imagro</h2>
+        <p>
+          Explore una completa colección de datos sobre cultivos vegetales para
+          investigación y análisis.
+        </p>
+      </div>
+      <button class="btn-download">📂 Download</button>
+    </div>
+
+    <hr class="divider" />
+
+    <!-- 🔹 Ruta Actual -->
+    <p class="dataset-path">
+      <strong>Ruta:</strong>
+      <span class="ruta-actual"
+        >{{ rutaActual }} ({{ carpetas.length }} directorios)</span
+      >
+    </p>
+
+    <!-- 🔹 Contenido Principal (AHORA INCLUYE LAS IMÁGENES) -->
+    <div class="dataset-content">
+      <!-- 🔹 Sección de Carpetas e Imágenes -->
+      <div class="dataset-folders">
+        <!-- 🔹 Galería de Imágenes (AHORA DENTRO DEL CONTENEDOR) -->
+        <div class="imagenes-container" *ngIf="imagenes.length > 0">
+          <h3>Imágenes en esta carpeta</h3>
+          <div class="imagenes-grid">
+            <div class="imagen-card" *ngFor="let imagen of imagenes">
+              <img
+                [src]="imagen.url"
+                [attr.alt]="imagen.nombre || 'Imagen sin nombre'"
+                [attr.title]="imagen.nombre || 'Imagen sin nombre'"
+              />
+              <p>{{ imagen.nombre }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 🔹 Listado de Carpetas -->
+        <div class="folders-grid">
+          <div
+            class="folder-card"
+            *ngFor="let carpeta of carpetas"
+            (click)="navegar(carpeta.ruta)"
+          >
+            <img src="assets/icons/folder.png" alt="Carpeta" />
+            <p>{{ carpeta.nombre }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🔹 Explorador de Datos -->
+      <div class="dataset-sidebar">
+        <h3>Explorador de datos</h3>
+        <ul class="file-tree">
+          <li *ngFor="let carpeta of estructuraExplorador">
+            <label>
+              <input type="checkbox" [(ngModel)]="carpeta.seleccionado" />
+              <span class="carpeta-navegable" (click)="toggleCarpeta(carpeta)">
+                <span *ngIf="carpeta.abierta">▼</span>
+                <span *ngIf="!carpeta.abierta">▶</span>
+                📂 {{ carpeta.nombre }}
+              </span>
+            </label>
+            <ul *ngIf="carpeta.abierta">
+              <ng-container
+                *ngTemplateOutlet="mostrarSubcarpetas; context: { carpetas: carpeta.subcarpetas }"
+              ></ng-container>
+            </ul>
+          </li>
+        </ul>
+
+        <!-- 🔹 Resumen -->
+        <h3>Resumen</h3>
+        <p>📦 {{ totalArchivos }} archivos</p>
+        <p>💾 {{ totalGB }} GB</p>
+        <p>🕒 Updated {{ lastUpdated }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 🔹 Plantilla Recursiva para Subcarpetas -->
+<ng-template #mostrarSubcarpetas let-carpetas="carpetas">
+  <li *ngFor="let subcarpeta of carpetas">
+    <label>
+      <input type="checkbox" [(ngModel)]="subcarpeta.seleccionado" />
+      <span (click)="toggleCarpeta(subcarpeta)">
+        <span *ngIf="subcarpeta.abierta">▼</span>
+        <span *ngIf="!subcarpeta.abierta">▶</span>
+        📂 {{ subcarpeta.nombre }}
+      </span>
+    </label>
+    <ul *ngIf="subcarpeta.abierta">
+      <ng-container
+        *ngTemplateOutlet="mostrarSubcarpetas; context: { carpetas: subcarpeta.subcarpetas }"
+      ></ng-container>
+    </ul>
+  </li>
+</ng-template>
