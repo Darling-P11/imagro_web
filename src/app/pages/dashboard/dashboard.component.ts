@@ -4,11 +4,12 @@ import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { AuthService } from '../../services/auth.service';
 import { NgClass, NgIf, TitleCasePipe } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { GeoreferenceComponent } from '../dashboard/georeference/georeference.component';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [NgClass, NgIf, TitleCasePipe, RouterModule],
+  imports: [NgClass, NgIf, TitleCasePipe, RouterModule, GeoreferenceComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })

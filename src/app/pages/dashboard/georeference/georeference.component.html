@@ -1,1 +1,6 @@
-<p>georeference works!</p>
+<div class="map-container">
+    <google-map width="100%" height="500px" [center]="center" [zoom]="zoom">
+      <map-marker *ngFor="let marker of markers" [position]="marker"></map-marker>
+    </google-map>
+  </div>
+  

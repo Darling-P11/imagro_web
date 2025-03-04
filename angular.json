@@ -30,7 +30,8 @@
               
             ],
             "scripts": [
-              "src/assets/js/main.js"
+              "src/assets/js/main.js",
+              "https://maps.googleapis.com/maps/api/js?key=AIzaSyD-4caHEmTTFnDGf-8F8tYRHJSmP-htPRQ"
               
               
             ]
