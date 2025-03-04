@@ -1,6 +1,19 @@
 <div class="map-container">
-    <google-map width="100%" height="500px" [center]="center" [zoom]="zoom">
-      <map-marker *ngFor="let marker of markers" [position]="marker"></map-marker>
-    </google-map>
-  </div>
+  <google-map width="100%" height="500px" [center]="center" [zoom]="zoom">
+    <map-marker
+      *ngFor="let marker of markers"
+      [position]="{ lat: marker.latitud, lng: marker.longitud }"
+      (mapClick)="openInfoWindow(marker)">
+    </map-marker>
   
+    <map-info-window #infoWindow>
+      <div class="info-content">
+        <h4>{{ selectedMarker?.cultivo }}</h4>
+        <p><strong>Enfermedad:</strong> {{ selectedMarker?.enfermedad }}</p>
+        <p><strong>Estado:</strong> {{ selectedMarker?.estado }}</p>
+        <p><strong>Tipo:</strong> {{ selectedMarker?.tipo }}</p>
+        <img *ngIf="selectedMarker?.url" [src]="selectedMarker?.url" width="150px" alt="Imagen de Cultivo">
+      </div>
+    </map-info-window>
+  </google-map>  
+</div>

@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { ContributionService } from '../../../services/contribution.service';
 import { getAuth } from 'firebase/auth';
-import { CommonModule, DatePipe, JsonPipe } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-contributions',
   standalone: true,
-  imports: [CommonModule, DatePipe, JsonPipe],
+  imports: [CommonModule, DatePipe],
   templateUrl: './contributions.component.html',
   styleUrls: ['./contributions.component.css'],
 })
