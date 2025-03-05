@@ -1,12 +1,16 @@
 import { Injectable, inject } from '@angular/core';
 import { Firestore, collection, collectionData, doc, getDoc, getDocs, updateDoc, deleteDoc, setDoc } from '@angular/fire/firestore';
 import { Observable, from } from 'rxjs';
+import { Storage, getStorage, ref, listAll, getDownloadURL, deleteObject, uploadBytes } from '@angular/fire/storage';
+
+
 
 @Injectable({
   providedIn: 'root',
 })
 export class ContributionService {
-  private firestore = inject(Firestore); // ✅ Inyección correcta de Firestore
+  private firestore = inject(Firestore);
+  private storage = getStorage();// ✅ Firebase Storage
 
   // 🔍 Obtener todas las configuraciones pendientes de todos los usuarios
   getPendingContributions(): Observable<any[]> {
@@ -84,44 +88,114 @@ export class ContributionService {
   // 🔄 Mover contribución y configuración a la colección rechazado
   async rejectContribution(userId: string, contributionId: string, configId: string): Promise<void> {
     try {
-      // 🔍 Referencias a los documentos originales
+      // 🔍 Obtener referencias de Firestore
       const contributionRef = doc(this.firestore, `historialContribuciones/${userId}/enviado/${contributionId}`);
       const configRef = doc(this.firestore, `historialConfiguracion/${userId}/enviado/${configId}`);
-  
-      // 📥 Obtener los datos de los documentos
+
+      // 📥 Obtener los datos de las contribuciones
       const contributionSnapshot = await getDoc(contributionRef);
       const configSnapshot = await getDoc(configRef);
-  
-      if (contributionSnapshot.exists() && configSnapshot.exists()) {
-        let contributionData = contributionSnapshot.data();
-        let configData = configSnapshot.data();
-  
-        // ✅ Actualizar el estado y agregar la fecha de rechazo
-        const fechaRechazo = new Date().toISOString(); // Fecha en formato ISO
-        configData = {
-          ...configData,
-          estado: 'rechazado',
-          fecha_rechazo: fechaRechazo
-        };
-  
-        // ✅ Mover los documentos a la colección 'rechazado'
-        const rejectedContributionRef = doc(this.firestore, `historialContribuciones/${userId}/rechazado/${contributionId}`);
-        const rejectedConfigRef = doc(this.firestore, `historialConfiguracion/${userId}/rechazado/${configId}`);
-  
-        await setDoc(rejectedContributionRef, contributionData);
-        await setDoc(rejectedConfigRef, configData);
-  
-        // ❌ Eliminar los documentos de 'enviado'
-        await deleteDoc(contributionRef);
-        await deleteDoc(configRef);
-      } else {
-        throw new Error('Contribución o configuración no encontrada');
+
+      if (!contributionSnapshot.exists() || !configSnapshot.exists()) {
+        throw new Error('❌ Contribución o configuración no encontrada');
       }
+
+      let contributionData = contributionSnapshot.data();
+      let configData = configSnapshot.data();
+
+      // ✅ Definir rutas
+      const baseImageFolderPath = `contribuciones_por_aprobar/${userId}/${contributionId}`;
+      const rejectedFolderPath = `contribuciones_rechazadas/${userId}/${contributionId}`;
+
+      console.log(`🔍 Explorando imágenes en: ${baseImageFolderPath}`);
+
+      // ✅ Obtener todas las imágenes dentro de las subcarpetas
+      let updatedImageUrls: string[] = [];
+      await this.recursivelyMoveImages(baseImageFolderPath, rejectedFolderPath, updatedImageUrls);
+
+      if (updatedImageUrls.length === 0) {
+        console.warn(`⚠️ No se encontraron imágenes para mover.`);
+        return;
+      }
+
+      // ✅ Actualizar Firestore con las nuevas URLs y estado rechazado
+      contributionData['imagenes'] = updatedImageUrls;
+      configData['estado'] = 'rechazado';
+      configData['fecha_rechazo'] = new Date().toISOString();
+
+      // ✅ Mover la contribución a 'rechazado'
+      const rejectedContributionRef = doc(this.firestore, `historialContribuciones/${userId}/rechazado/${contributionId}`);
+      const rejectedConfigRef = doc(this.firestore, `historialConfiguracion/${userId}/rechazado/${configId}`);
+
+      await setDoc(rejectedContributionRef, contributionData);
+      await setDoc(rejectedConfigRef, configData);
+
+      // ❌ Eliminar los documentos originales en 'enviado'
+      await deleteDoc(contributionRef);
+      await deleteDoc(configRef);
+
+      console.log('✅ Contribución rechazada y movida correctamente');
+
     } catch (error) {
       console.error('❌ Error al rechazar la contribución:', error);
       throw error;
     }
   }
+
+/**
+ * 🔄 Función recursiva para mover imágenes dentro de subcarpetas
+ */
+private async recursivelyMoveImages(sourcePath: string, targetPath: string, updatedImageUrls: string[]): Promise<void> {
+  try {
+    const folderRef = ref(this.storage, sourcePath);
+    const folderContents = await listAll(folderRef);
+
+    for (const item of folderContents.items) {
+      const imageName = item.name;
+      const oldImageRef = ref(this.storage, `${sourcePath}/${imageName}`);
+      const newImageRef = ref(this.storage, `${targetPath}/${imageName}`);
+
+      let imageBlob: Blob | null = null;
+
+      try {
+        // 📤 Intentar descargar la imagen original
+        const response = await fetch(await getDownloadURL(oldImageRef));
+        if (!response.ok) throw new Error("Error en la respuesta de la imagen");
+        imageBlob = await response.blob();
+      } catch (error) {
+        console.error(`❌ Error al descargar la imagen ${imageName}:`, error);
+        continue; // Evita detener todo el proceso si una imagen falla
+      }
+
+      if (imageBlob) {
+        // 📤 Subir la imagen a la nueva carpeta
+        await uploadBytes(newImageRef, imageBlob);
+
+        // ✅ Obtener la nueva URL
+        const newImageUrl = await getDownloadURL(newImageRef);
+        updatedImageUrls.push(newImageUrl);
+
+        // ❌ Eliminar la imagen original después de moverla
+        await deleteObject(oldImageRef);
+      }
+    }
+
+    // 🔄 Recursividad: Buscar más subcarpetas dentro del folder
+    for (const folder of folderContents.prefixes) {
+      const newSourcePath = `${sourcePath}/${folder.name}`;
+      const newTargetPath = `${targetPath}/${folder.name}`;
+      await this.recursivelyMoveImages(newSourcePath, newTargetPath, updatedImageUrls);
+    }
+
+  } catch (error) {
+    console.error(`❌ Error al mover imágenes en ${sourcePath}:`, error);
+  }
+}
+
+
+
+  
+  
 //ACEPTACION DE LA CONTRIBUCION
   async acceptContribution(userId: string, contributionId: string, configId: string): Promise<void> {
     try {

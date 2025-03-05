@@ -46,9 +46,8 @@ isVisualizeModalVisible: boolean = false; // ✅ Control del modal de visualizac
 
 // ✅ Actualizar estado de una contribución (aceptar o rechazar)
 async updateStatus(contribution: any, status: string): Promise<void> {
-  this.rejectingContributionId = contribution.id; // ✅ Activar el loading específico
-  this.currentAction = status as 'rechazado' | 'aceptado'; // ✅ Forzar el tipo esperado
-
+  this.rejectingContributionId = contribution.id;
+  this.currentAction = status as 'rechazado' | 'aceptado';
 
   try {
     const contributionId = contribution.configuracionCompleta.contribucion_id;
@@ -67,15 +66,16 @@ async updateStatus(contribution: any, status: string): Promise<void> {
       );
     }
 
-    // 🔄 Esperar a que la tabla se actualice antes de finalizar el loading
+    // 🔄 Recargar la lista de contribuciones
     await this.loadPendingContributions();
   } catch (error) {
     console.error(`❌ Error al actualizar el estado a ${status}:`, error);
   } finally {
-    this.rejectingContributionId = null; // ✅ Desactivar el loading
-    this.currentAction = null; // ✅ Resetear el estado
+    this.rejectingContributionId = null;
+    this.currentAction = null;
   }
 }
+
 
 
 
