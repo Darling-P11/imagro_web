@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { getStorage, ref, listAll, getDownloadURL, getMetadata } from 'firebase/storage';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
+
 
 interface Carpeta {
   nombre: string;
@@ -270,11 +273,123 @@ export class DatasetsComponent implements OnInit {
     }
   }
 
-  confirmarDescarga() {
-    const seleccionados = this.obtenerSeleccionados(this.elementosDescarga);
-    console.log("📥 Elementos seleccionados para descarga:", seleccionados);
-    this.cerrarModal();
+  async confirmarDescarga() {
+    let seleccionados = this.obtenerSeleccionados(this.elementosDescarga);
+  
+    if (seleccionados.length === 0) {
+      alert("⚠ No has seleccionado ningún archivo para descargar.");
+      return;
+    }
+  
+    console.log("📥 Descargando elementos seleccionados:", seleccionados);
+  
+    try {
+      const zip = new JSZip();
+      let archivosFinales: string[] = [];
+  
+      // 🔹 Verificar si la ruta es una carpeta y buscar archivos dentro
+      for (const ruta of seleccionados) {
+        if (!ruta.includes('.')) { // Solo procesar si NO es un archivo (posible carpeta)
+          const archivosDentro = await this.obtenerArchivosDeCarpeta(ruta);
+          archivosFinales.push(...archivosDentro);
+        } else {
+          archivosFinales.push(ruta); // Si ya es un archivo, lo agregamos directamente
+        }
+      }
+  
+      console.log("📂 Archivos reales que se descargarán:", archivosFinales);
+  
+      if (archivosFinales.length === 0) {
+        alert("⚠ No se encontraron archivos en las rutas seleccionadas.");
+        return;
+      }
+  
+      const archivosDescargados = await this.agregarArchivosAlZip(archivosFinales, zip);
+  
+      if (archivosDescargados === 0) {
+        alert("⚠ No se pudieron agregar archivos al ZIP.");
+        return;
+      }
+  
+      // 🔹 Generar y descargar el ZIP
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      saveAs(zipBlob, 'datasets_seleccionados.zip');
+  
+      console.log("✅ ZIP generado y descargado con éxito.");
+      this.cerrarModal();
+    } catch (error) {
+      console.error("❌ Error al generar el ZIP:", error);
+      alert("❌ Ocurrió un error al generar el ZIP. Revisa la consola para más detalles.");
+    }
   }
+  
+  
+  
+  async obtenerArchivosDeCarpeta(rutaCarpeta: string): Promise<string[]> {
+    const storage = getStorage();
+    const carpetaRef = ref(storage, rutaCarpeta);
+    let archivos: string[] = [];
+  
+    try {
+      const listado = await listAll(carpetaRef);
+  
+      // 🔹 Agregar archivos que tengan extensión válida (.jpg, .png, .txt, etc.)
+      for (const item of listado.items) {
+        if (item.fullPath.includes('.')) { // Solo agregamos archivos reales
+          archivos.push(item.fullPath);
+        }
+      }
+  
+      // 🔹 Buscar dentro de subcarpetas
+      for (const subFolder of listado.prefixes) {
+        const archivosSubCarpeta = await this.obtenerArchivosDeCarpeta(subFolder.fullPath);
+        archivos.push(...archivosSubCarpeta);
+      }
+  
+      console.log(`📂 Archivos encontrados en ${rutaCarpeta}:`, archivos);
+      return archivos;
+    } catch (error) {
+      console.error(`❌ Error obteniendo archivos en la carpeta ${rutaCarpeta}:`, error);
+      return [];
+    }
+  }
+  
+  
+  
+  
+  
+  
+  
+  async agregarArchivosAlZip(archivos: string[], zip: JSZip) {
+    const storage = getStorage();
+    let archivosAgregados = 0;
+  
+    for (const ruta of archivos) {
+      try {
+        const archivoRef = ref(storage, ruta);
+        const url = await getDownloadURL(archivoRef);
+  
+        console.log(`⬇ Descargando archivo: ${ruta} - URL: ${url}`);
+  
+        // 🔹 Descargar el archivo
+        const respuesta = await fetch(url);
+        const blob = await respuesta.blob();
+  
+        // 🔹 Agregar al ZIP manteniendo la estructura de carpetas
+        zip.file(ruta, blob);
+        archivosAgregados++;
+  
+      } catch (error) {
+        console.error(`❌ Error al descargar el archivo ${ruta}:`, error);
+      }
+    }
+  
+    return archivosAgregados;
+  }
+  
+  
+  
+  
 
   obtenerSeleccionados(elementos: ElementoDescarga[]): string[] {
     let seleccionados: string[] = [];
