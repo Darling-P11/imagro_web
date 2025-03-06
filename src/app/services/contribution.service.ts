@@ -88,6 +88,141 @@ export class ContributionService {
   // 🔄 Mover contribución y configuración a la colección rechazado
   async rejectContribution(userId: string, contributionId: string, configId: string): Promise<void> {
     try {
+        // 🔍 Obtener referencias de Firestore
+        const contributionRef = doc(this.firestore, `historialContribuciones/${userId}/enviado/${contributionId}`);
+        const configRef = doc(this.firestore, `historialConfiguracion/${userId}/enviado/${configId}`);
+
+        // 📥 Obtener los datos de las contribuciones
+        const contributionSnapshot = await getDoc(contributionRef);
+        const configSnapshot = await getDoc(configRef);
+
+        if (!contributionSnapshot.exists() || !configSnapshot.exists()) {
+            throw new Error('❌ Contribución o configuración no encontrada');
+        }
+
+        let contributionData = contributionSnapshot.data();
+        let configData = configSnapshot.data();
+
+        // ✅ Definir rutas de imágenes
+        const baseImageFolderPath = `contribuciones_por_aprobar/${userId}/${contributionId}`;
+        const rejectedFolderPath = `contribuciones_rechazadas/${userId}/${contributionId}`;
+
+        console.log(`🔍 Explorando imágenes en: ${baseImageFolderPath}`);
+
+        // ✅ Obtener todas las imágenes dentro de las subcarpetas
+        let updatedImageObjects: any[] = [];
+        await this.recursivelyMoveImages(
+            baseImageFolderPath, 
+            rejectedFolderPath, 
+            contributionData['imagenes'], 
+            updatedImageObjects
+        );
+
+        if (updatedImageObjects.length === 0) {
+            console.warn(`⚠️ No se encontraron imágenes para mover.`);
+            return;
+        }
+
+        // ✅ Actualizar Firestore con las nuevas URLs y conservar metadatos
+        contributionData['imagenes'] = updatedImageObjects;
+        configData['estado'] = 'rechazado';
+        configData['fecha_rechazo'] = new Date().toISOString();
+
+        // ✅ Mover la contribución a 'rechazado'
+        const rejectedContributionRef = doc(this.firestore, `historialContribuciones/${userId}/rechazado/${contributionId}`);
+        const rejectedConfigRef = doc(this.firestore, `historialConfiguracion/${userId}/rechazado/${configId}`);
+
+        await setDoc(rejectedContributionRef, contributionData);
+        await setDoc(rejectedConfigRef, configData);
+
+        // ❌ Eliminar los documentos originales en 'enviado'
+        await deleteDoc(contributionRef);
+        await deleteDoc(configRef);
+
+        console.log('✅ Contribución rechazada y movida correctamente');
+
+    } catch (error) {
+        console.error('❌ Error al rechazar la contribución:', error);
+        throw error;
+    }
+}
+
+/**
+ * 🔄 Función recursiva para mover imágenes dentro de subcarpetas y conservar metadatos
+ */
+private async recursivelyMoveImages(
+    sourcePath: string,
+    targetPath: string,
+    originalImageObjects: any[],
+    updatedImageObjects: any[]
+): Promise<void> {
+    try {
+        const folderRef = ref(this.storage, sourcePath);
+        const folderContents = await listAll(folderRef);
+
+        for (const item of folderContents.items) {
+            const imageName = item.name;
+            const oldImageRef = ref(this.storage, `${sourcePath}/${imageName}`);
+            const newImageRef = ref(this.storage, `${targetPath}/${imageName}`);
+
+            let imageBlob: Blob | null = null;
+
+            try {
+                // 📥 Intentar descargar la imagen original
+                const response = await fetch(await getDownloadURL(oldImageRef));
+                if (!response.ok) throw new Error("Error en la respuesta de la imagen");
+                imageBlob = await response.blob();
+            } catch (error) {
+                console.error(`❌ Error al descargar la imagen ${imageName}:`, error);
+                continue;
+            }
+
+            if (imageBlob) {
+                // 📤 Subir la imagen a la nueva carpeta
+                await uploadBytes(newImageRef, imageBlob);
+
+                // ✅ Obtener la nueva URL
+                const newImageUrl = await getDownloadURL(newImageRef);
+
+                // 🔍 Buscar la información original de esta imagen en el array de imágenes
+                let originalImageData = originalImageObjects.find(img => img.url.includes(imageName));
+
+                if (originalImageData) {
+                    // 🔄 Crear un nuevo objeto con la misma información, pero con la URL actualizada
+                    updatedImageObjects.push({
+                        ...originalImageData,
+                        url: newImageUrl
+                    });
+                } else {
+                    console.warn(`⚠️ No se encontró información previa para la imagen ${imageName}.`);
+                    updatedImageObjects.push({ url: newImageUrl });
+                }
+
+                // ❌ Eliminar la imagen original después de moverla
+                await deleteObject(oldImageRef);
+            }
+        }
+
+        // 🔄 Recursividad: Buscar más subcarpetas dentro del folder
+        for (const folder of folderContents.prefixes) {
+            const newSourcePath = `${sourcePath}/${folder.name}`;
+            const newTargetPath = `${targetPath}/${folder.name}`;
+            await this.recursivelyMoveImages(newSourcePath, newTargetPath, originalImageObjects, updatedImageObjects);
+        }
+
+    } catch (error) {
+        console.error(`❌ Error al mover imágenes en ${sourcePath}:`, error);
+    }
+}
+
+
+
+
+  
+  
+//ACEPTACION DE LA CONTRIBUCION
+async acceptContribution(userId: string, contributionId: string, configId: string): Promise<void> {
+  try {
       // 🔍 Obtener referencias de Firestore
       const contributionRef = doc(this.firestore, `historialContribuciones/${userId}/enviado/${contributionId}`);
       const configRef = doc(this.firestore, `historialConfiguracion/${userId}/enviado/${configId}`);
@@ -97,146 +232,128 @@ export class ContributionService {
       const configSnapshot = await getDoc(configRef);
 
       if (!contributionSnapshot.exists() || !configSnapshot.exists()) {
-        throw new Error('❌ Contribución o configuración no encontrada');
+          throw new Error('❌ Contribución o configuración no encontrada');
       }
 
       let contributionData = contributionSnapshot.data();
       let configData = configSnapshot.data();
 
-      // ✅ Definir rutas
+      // ✅ Definir rutas de imágenes
       const baseImageFolderPath = `contribuciones_por_aprobar/${userId}/${contributionId}`;
-      const rejectedFolderPath = `contribuciones_rechazadas/${userId}/${contributionId}`;
+      const acceptedFolderPath = `contribuciones_aceptadas/${userId}/${contributionId}`;
 
       console.log(`🔍 Explorando imágenes en: ${baseImageFolderPath}`);
 
       // ✅ Obtener todas las imágenes dentro de las subcarpetas
-      let updatedImageUrls: string[] = [];
-      await this.recursivelyMoveImages(baseImageFolderPath, rejectedFolderPath, updatedImageUrls);
+      let updatedImageObjects: any[] = [];
+      await this.recursivelyMoveImages_Acept(
+          baseImageFolderPath, 
+          acceptedFolderPath, 
+          contributionData['imagenes'], 
+          updatedImageObjects
+      );
 
-      if (updatedImageUrls.length === 0) {
-        console.warn(`⚠️ No se encontraron imágenes para mover.`);
-        return;
+      if (updatedImageObjects.length === 0) {
+          console.warn(`⚠️ No se encontraron imágenes para mover.`);
+          return;
       }
 
-      // ✅ Actualizar Firestore con las nuevas URLs y estado rechazado
-      contributionData['imagenes'] = updatedImageUrls;
-      configData['estado'] = 'rechazado';
-      configData['fecha_rechazo'] = new Date().toISOString();
+      // ✅ Actualizar Firestore con las nuevas URLs y conservar metadatos
+      contributionData['imagenes'] = updatedImageObjects;
+      configData['estado'] = 'aceptado';
+      configData['fecha_aceptacion'] = new Date().toISOString();
 
-      // ✅ Mover la contribución a 'rechazado'
-      const rejectedContributionRef = doc(this.firestore, `historialContribuciones/${userId}/rechazado/${contributionId}`);
-      const rejectedConfigRef = doc(this.firestore, `historialConfiguracion/${userId}/rechazado/${configId}`);
+      // ✅ Mover la contribución a 'aceptado'
+      const acceptedContributionRef = doc(this.firestore, `historialContribuciones/${userId}/aceptado/${contributionId}`);
+      const acceptedConfigRef = doc(this.firestore, `historialConfiguracion/${userId}/aceptado/${configId}`);
 
-      await setDoc(rejectedContributionRef, contributionData);
-      await setDoc(rejectedConfigRef, configData);
+      await setDoc(acceptedContributionRef, contributionData);
+      await setDoc(acceptedConfigRef, configData);
 
       // ❌ Eliminar los documentos originales en 'enviado'
       await deleteDoc(contributionRef);
       await deleteDoc(configRef);
 
-      console.log('✅ Contribución rechazada y movida correctamente');
-
-    } catch (error) {
-      console.error('❌ Error al rechazar la contribución:', error);
-      throw error;
-    }
-  }
-
-/**
- * 🔄 Función recursiva para mover imágenes dentro de subcarpetas
- */
-private async recursivelyMoveImages(sourcePath: string, targetPath: string, updatedImageUrls: string[]): Promise<void> {
-  try {
-    const folderRef = ref(this.storage, sourcePath);
-    const folderContents = await listAll(folderRef);
-
-    for (const item of folderContents.items) {
-      const imageName = item.name;
-      const oldImageRef = ref(this.storage, `${sourcePath}/${imageName}`);
-      const newImageRef = ref(this.storage, `${targetPath}/${imageName}`);
-
-      let imageBlob: Blob | null = null;
-
-      try {
-        // 📤 Intentar descargar la imagen original
-        const response = await fetch(await getDownloadURL(oldImageRef));
-        if (!response.ok) throw new Error("Error en la respuesta de la imagen");
-        imageBlob = await response.blob();
-      } catch (error) {
-        console.error(`❌ Error al descargar la imagen ${imageName}:`, error);
-        continue; // Evita detener todo el proceso si una imagen falla
-      }
-
-      if (imageBlob) {
-        // 📤 Subir la imagen a la nueva carpeta
-        await uploadBytes(newImageRef, imageBlob);
-
-        // ✅ Obtener la nueva URL
-        const newImageUrl = await getDownloadURL(newImageRef);
-        updatedImageUrls.push(newImageUrl);
-
-        // ❌ Eliminar la imagen original después de moverla
-        await deleteObject(oldImageRef);
-      }
-    }
-
-    // 🔄 Recursividad: Buscar más subcarpetas dentro del folder
-    for (const folder of folderContents.prefixes) {
-      const newSourcePath = `${sourcePath}/${folder.name}`;
-      const newTargetPath = `${targetPath}/${folder.name}`;
-      await this.recursivelyMoveImages(newSourcePath, newTargetPath, updatedImageUrls);
-    }
+      console.log('✅ Contribución aceptada y movida correctamente');
 
   } catch (error) {
-    console.error(`❌ Error al mover imágenes en ${sourcePath}:`, error);
+      console.error('❌ Error al aceptar la contribución:', error);
+      throw error;
   }
 }
 
 
+/**
+* 🔄 Función recursiva para mover imágenes dentro de subcarpetas y conservar su metadata
+*/
+/**
+ * 🔄 Función recursiva para mover imágenes dentro de subcarpetas y conservar metadatos
+ */
+private async recursivelyMoveImages_Acept(
+  sourcePath: string,
+  targetPath: string,
+  originalImageObjects: any[],
+  updatedImageObjects: any[]
+): Promise<void> {
+  try {
+      const folderRef = ref(this.storage, sourcePath);
+      const folderContents = await listAll(folderRef);
 
-  
-  
-//ACEPTACION DE LA CONTRIBUCION
-  async acceptContribution(userId: string, contributionId: string, configId: string): Promise<void> {
-    try {
-      // 🔍 Referencias a los documentos originales
-      const contributionRef = doc(this.firestore, `historialContribuciones/${userId}/enviado/${contributionId}`);
-      const configRef = doc(this.firestore, `historialConfiguracion/${userId}/enviado/${configId}`);
-  
-      // 📥 Obtener los datos de los documentos
-      const contributionSnapshot = await getDoc(contributionRef);
-      const configSnapshot = await getDoc(configRef);
-  
-      if (contributionSnapshot.exists() && configSnapshot.exists()) {
-        let contributionData = contributionSnapshot.data();
-        let configData = configSnapshot.data();
-  
-        // ✅ Actualizar el estado y agregar la fecha de aceptación
-        const fechaAceptacion = new Date().toISOString(); // Fecha en formato ISO
-        configData = {
-          ...configData,
-          estado: 'aceptado',
-          fecha_aceptacion: fechaAceptacion
-        };
-  
-        // ✅ Mover los documentos a la colección 'aceptado'
-        const acceptedContributionRef = doc(this.firestore, `historialContribuciones/${userId}/aceptado/${contributionId}`);
-        const acceptedConfigRef = doc(this.firestore, `historialConfiguracion/${userId}/aceptado/${configId}`);
-  
-        await setDoc(acceptedContributionRef, contributionData);
-        await setDoc(acceptedConfigRef, configData);
-  
-        // ❌ Eliminar los documentos de 'enviado'
-        await deleteDoc(contributionRef);
-        await deleteDoc(configRef);
-      } else {
-        throw new Error('Contribución o configuración no encontrada');
+      for (const item of folderContents.items) {
+          const imageName = item.name;
+          const oldImageRef = ref(this.storage, `${sourcePath}/${imageName}`);
+          const newImageRef = ref(this.storage, `${targetPath}/${imageName}`);
+
+          let imageBlob: Blob | null = null;
+
+          try {
+              // 📥 Intentar descargar la imagen original
+              const response = await fetch(await getDownloadURL(oldImageRef));
+              if (!response.ok) throw new Error("Error en la respuesta de la imagen");
+              imageBlob = await response.blob();
+          } catch (error) {
+              console.error(`❌ Error al descargar la imagen ${imageName}:`, error);
+              continue;
+          }
+
+          if (imageBlob) {
+              // 📤 Subir la imagen a la nueva carpeta
+              await uploadBytes(newImageRef, imageBlob);
+
+              // ✅ Obtener la nueva URL
+              const newImageUrl = await getDownloadURL(newImageRef);
+
+              // 🔍 Buscar la información original de esta imagen en el array de imágenes
+              let originalImageData = originalImageObjects.find(img => img.url.includes(imageName));
+
+              if (originalImageData) {
+                  // 🔄 Crear un nuevo objeto con la misma información, pero con la URL actualizada
+                  updatedImageObjects.push({
+                      ...originalImageData,
+                      url: newImageUrl
+                  });
+              } else {
+                  console.warn(`⚠️ No se encontró información previa para la imagen ${imageName}.`);
+                  updatedImageObjects.push({ url: newImageUrl });
+              }
+
+              // ❌ Eliminar la imagen original después de moverla
+              await deleteObject(oldImageRef);
+          }
       }
-    } catch (error) {
-      console.error('❌ Error al aceptar la contribución:', error);
-      throw error;
-    }
+
+      // 🔄 Recursividad: Buscar más subcarpetas dentro del folder
+      for (const folder of folderContents.prefixes) {
+          const newSourcePath = `${sourcePath}/${folder.name}`;
+          const newTargetPath = `${targetPath}/${folder.name}`;
+          await this.recursivelyMoveImages_Acept(newSourcePath, newTargetPath, originalImageObjects, updatedImageObjects);
+      }
+
+  } catch (error) {
+      console.error(`❌ Error al mover imágenes en ${sourcePath}:`, error);
   }
+}
+
 
 
   //RECHAZO DE IMAGEN Y RESTRUCTURACION EN FIRESTOREGE
