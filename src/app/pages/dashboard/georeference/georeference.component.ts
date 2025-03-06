@@ -14,7 +14,9 @@ interface GeoMarker {
   estado?: string;
   tipo?: string;
   url?: string;
+  profileImage?: string; // ✅ Agregamos la propiedad faltante
 }
+
 
 @Component({
   selector: 'app-georeference',
@@ -67,36 +69,56 @@ export class GeoreferenceComponent implements OnInit, AfterViewInit {
   
       let allMarkers: GeoMarker[] = [];
   
-      console.log("📌 Total de contribuciones aceptadas encontradas:", contribucionesSnapshot.docs.length);
-  
       for (const contribucionDoc of contribucionesSnapshot.docs) {
         const data = contribucionDoc.data();
-        console.log("📌 Datos obtenidos de Firestore:", data);
   
         if (data['ubicacion'] && data['ubicacion']['latitud'] && data['ubicacion']['longitud']) {
+          const userId = data['usuario']; // ID del usuario
+  
+          // Buscar la foto de perfil en Firestore
+          let profileImageUrl = '';
+          if (userId) {
+            const userDocRef = doc(this.firestore, `users/${userId}`);
+            const userDocSnap = await getDocs(collection(this.firestore, `users`));
+            userDocSnap.forEach(doc => {
+              if (doc.id === userId) {
+                profileImageUrl = doc.data()['profileImage'] || ''; // Obtener la imagen de perfil
+              }
+            });
+          }
+  
+          // Crear el marcador con la imagen de perfil
           const marker: GeoMarker = {
             latitud: data['ubicacion']['latitud'],
             longitud: data['ubicacion']['longitud'],
             direccion: data['ubicacion']['direccion'] || 'Ubicación desconocida',
-            usuario: data['usuario'] || 'Desconocido',
+            usuario: userId || 'Desconocido',
             cultivo: data['imagenes']?.[0]?.['cultivo'] || 'Sin especificar',
             enfermedad: data['imagenes']?.[0]?.['enfermedad'] || 'Sin especificar',
             estado: data['imagenes']?.[0]?.['estado'] || 'Sin especificar',
             tipo: data['imagenes']?.[0]?.['tipo'] || 'Sin especificar',
-            url: data['imagenes']?.[0]?.['url'] || ''
+            url: data['imagenes']?.[0]?.['url'] || '',
+            profileImage: profileImageUrl, // Agregar la foto de perfil
           };
   
-          console.log("✅ Marcador agregado:", marker);
           allMarkers.push(marker);
         }
       }
   
       this.markers = allMarkers;
-      console.log("🎯 Total de marcadores cargados:", this.markers.length);
     } catch (error) {
       console.error("❌ Error cargando marcadores:", error);
     }
   }
+  
+  //CARGA MARCADOR
+  getMarkerIcon(profileImageUrl?: string): google.maps.Icon {
+    return {
+      url: profileImageUrl || 'assets/icons/default-marker_2.png', // Imagen de perfil o marcador por defecto
+      scaledSize: new google.maps.Size(40, 40) // Tamaño del icono
+    };
+  }
+  
   
   
 

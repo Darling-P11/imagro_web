@@ -20,6 +20,7 @@ export class DashboardComponent implements OnInit {
   userEmail: string = '';
   isLoading: boolean = true;
   isSidebarCollapsed: boolean = false;
+  isHeaderVisible: boolean = true;
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -53,17 +54,15 @@ export class DashboardComponent implements OnInit {
   // ✅ Alternar Sidebar
   toggleSidebar() {
     this.isSidebarCollapsed = !this.isSidebarCollapsed;
-    const headerElement = document.getElementById('header');
     const mainElement = document.getElementById('main');
-
+  
     if (this.isSidebarCollapsed) {
-      headerElement?.classList.add('sidebar-collapsed');
       mainElement?.classList.add('sidebar-collapsed');
     } else {
-      headerElement?.classList.remove('sidebar-collapsed');
       mainElement?.classList.remove('sidebar-collapsed');
     }
   }
+  
 
   // ✅ Cerrar sesión
   logout() {
@@ -87,5 +86,9 @@ export class DashboardComponent implements OnInit {
       void mainContainer.offsetWidth; // Forzar reflow
       mainContainer.classList.add('dashboard-container');
     }
+  }
+
+  toggleHeader() {
+    this.isHeaderVisible = !this.isHeaderVisible; // ✅ Alternar visibilidad
   }
 }

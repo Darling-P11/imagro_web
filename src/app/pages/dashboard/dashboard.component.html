@@ -1,28 +1,13 @@
-<header class="header" [ngClass]="{ 'sidebar-collapsed': isSidebarCollapsed }">
-  <div class="header__container">
-    <button
-      type="button"
-      (click)="toggleSidebar()"
-      class="header__toggle"
-      title="Alternar barra lateral"
-    >
-      <i class="ri-menu-line"></i>
-    </button>
-
-    <a href="/dashboard" class="header__logo">
-      <img
-        src="assets/images/logo_banner_verde.png"
-        alt="Imagro Logo"
-        class="imagro-logo"
-      />
-    </a>
-  </div>
-</header>
-
-<!-- Sidebar -->
 <!-- Sidebar -->
 <nav class="sidebar" [ngClass]="{ 'show-sidebar': isSidebarCollapsed }" id="sidebar">
   <div class="sidebar__container">
+    
+    <!-- Botón de alternar Sidebar mejorado -->
+    <button class="sidebar__toggle" (click)="toggleSidebar()" title="Alternar barra lateral">
+      <i class="ri-arrow-left-s-line" *ngIf="!isSidebarCollapsed"></i>
+      <i class="ri-arrow-right-s-line" *ngIf="isSidebarCollapsed"></i>
+    </button>
+
     <div class="sidebar__user">
       <div class="sidebar__img">
         <img [src]="userPhoto" alt="image" />
@@ -37,37 +22,27 @@
     <div class="sidebar__content">
       <!-- 🔓 MÓDULOS PARA USUARIO NORMAL Y ADMINISTRADOR DE CULTIVO -->
       <div *ngIf="isUsuario() || isAdminCultivo()">
-        <h3 class="sidebar__title">MODULOS</h3>
+        <h3 class="sidebar__title">MÓDULOS</h3>
         <div class="sidebar__list">
-          <a routerLink="/dashboard/default" 
-             class="sidebar__link" 
-             routerLinkActive="active-link">
+          <a routerLink="/dashboard/default" class="sidebar__link" routerLinkActive="active-link">
             <i class="ri-pie-chart-2-fill"></i>
             <span *ngIf="!isSidebarCollapsed">Inicio</span>
           </a>
 
-          <a routerLink="/dashboard/datasets" 
-             class="sidebar__link" 
-             routerLinkActive="active-link">
+          <a routerLink="/dashboard/datasets" class="sidebar__link" routerLinkActive="active-link">
             <i class="ri-image-fill"></i>
             <span *ngIf="!isSidebarCollapsed">Datasets</span>
           </a>
 
-          <a routerLink="/dashboard/georeference" 
-             class="sidebar__link" 
-             routerLinkActive="active-link">
+          <a routerLink="/dashboard/georeference" class="sidebar__link" routerLinkActive="active-link">
             <i class="ri-road-map-line"></i>
             <span *ngIf="!isSidebarCollapsed">Georreferencias</span>
           </a>
 
-          <a routerLink="/dashboard/generate-models" 
-             class="sidebar__link" 
-             routerLinkActive="active-link">
+          <a routerLink="/dashboard/generate-models" class="sidebar__link" routerLinkActive="active-link">
             <i class="ri-bar-chart-box-fill"></i>
             <span *ngIf="!isSidebarCollapsed">Generar modelos</span>
           </a>
-
-          
         </div>
       </div>
 
@@ -75,17 +50,13 @@
       <div *ngIf="isAdminCultivo()">
         <h3 class="sidebar__title">ADMIN TOOLS</h3>
         <div class="sidebar__list">
-          <a *ngIf="userRole === 'administrador_cultivo'" 
-             routerLink="/dashboard/contributions" 
-             class="sidebar__link" 
-             routerLinkActive="active-link">
+          <a *ngIf="userRole === 'administrador_cultivo'" routerLink="/dashboard/contributions" 
+             class="sidebar__link" routerLinkActive="active-link">
             <i class="ri-database-2-fill"></i>
             <span *ngIf="!isSidebarCollapsed">Revisión de contribuciones</span>
           </a>
 
-          <a routerLink="/dashboard/tag-management" 
-             class="sidebar__link" 
-             routerLinkActive="active-link">
+          <a routerLink="/dashboard/tag-management" class="sidebar__link" routerLinkActive="active-link">
             <i class="ri-price-tag-3-fill"></i>
             <span *ngIf="!isSidebarCollapsed">Gestión de etiquetas</span>
           </a>
@@ -108,8 +79,6 @@
 </nav>
 
 <!-- Main Content -->
-<!-- Main Content -->
 <main class="dashboard-container main container" [ngClass]="{ 'left-pd': isSidebarCollapsed }" id="main">
-  <!-- Aquí se renderizan las páginas hijas -->
   <router-outlet></router-outlet>
 </main>

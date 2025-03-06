@@ -22,13 +22,17 @@
   >
     <!-- Marcadores con imagen de perfil en lugar del icono predeterminado -->
     <map-marker
-      *ngFor="let marker of markers; let i = index"
-      #markerRef="mapMarker"
-      [position]="{ lat: marker.latitud, lng: marker.longitud }"
-      [title]="marker.cultivo || 'Sin información'"
-      (mapClick)="openInfoWindow(marker, markerRef)"
-    >
-    </map-marker>
+  *ngFor="let marker of markers; let i = index"
+  #markerRef="mapMarker"
+  [position]="{ lat: marker.latitud, lng: marker.longitud }"
+  [title]="marker.cultivo || 'Sin información'"
+  (mapClick)="openInfoWindow(marker, markerRef)"
+  [icon]="getMarkerIcon(marker.profileImage)"
+>
+</map-marker>
+
+
+
 
     <!-- Info Window Mejorado -->
     <map-info-window #infoWindow>
