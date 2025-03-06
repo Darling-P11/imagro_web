@@ -238,15 +238,16 @@ async acceptContribution(userId: string, contributionId: string, configId: strin
       let contributionData = contributionSnapshot.data();
       let configData = configSnapshot.data();
 
-      // ✅ Definir rutas de imágenes
+      // ✅ Definir rutas de imágenes en la carpeta centralizada
+      const year = new Date().getFullYear(); // Obtener el año actual
       const baseImageFolderPath = `contribuciones_por_aprobar/${userId}/${contributionId}`;
-      const acceptedFolderPath = `contribuciones_aceptadas/${userId}/${contributionId}`;
+      const acceptedFolderPath = `contribuciones_aceptadas/${year}`;
 
       console.log(`🔍 Explorando imágenes en: ${baseImageFolderPath}`);
 
       // ✅ Obtener todas las imágenes dentro de las subcarpetas
       let updatedImageObjects: any[] = [];
-      await this.recursivelyMoveImages_Acept(
+      await this.recursivelyMoveImagesToAccepted(
           baseImageFolderPath, 
           acceptedFolderPath, 
           contributionData['imagenes'], 
@@ -283,15 +284,16 @@ async acceptContribution(userId: string, contributionId: string, configId: strin
 }
 
 
+
 /**
 * 🔄 Función recursiva para mover imágenes dentro de subcarpetas y conservar su metadata
 */
 /**
  * 🔄 Función recursiva para mover imágenes dentro de subcarpetas y conservar metadatos
  */
-private async recursivelyMoveImages_Acept(
+private async recursivelyMoveImagesToAccepted(
   sourcePath: string,
-  targetPath: string,
+  targetBasePath: string,
   originalImageObjects: any[],
   updatedImageObjects: any[]
 ): Promise<void> {
@@ -302,7 +304,19 @@ private async recursivelyMoveImages_Acept(
       for (const item of folderContents.items) {
           const imageName = item.name;
           const oldImageRef = ref(this.storage, `${sourcePath}/${imageName}`);
-          const newImageRef = ref(this.storage, `${targetPath}/${imageName}`);
+
+          // 📤 Extraer los metadatos originales de la imagen
+          let originalImageData = originalImageObjects.find(img => img.url.includes(imageName));
+
+          if (!originalImageData) {
+              console.warn(`⚠️ No se encontró información previa para la imagen ${imageName}.`);
+              continue; // Evitar procesar imágenes sin información
+          }
+
+          // 📂 Construir la nueva ruta en `contribuciones_aceptadas`
+          const newImageRef = ref(this.storage, 
+              `${targetBasePath}/${originalImageData.cultivo}/${originalImageData.tipo}/${originalImageData.estado}/${originalImageData.enfermedad}/${imageName}`
+          );
 
           let imageBlob: Blob | null = null;
 
@@ -323,19 +337,11 @@ private async recursivelyMoveImages_Acept(
               // ✅ Obtener la nueva URL
               const newImageUrl = await getDownloadURL(newImageRef);
 
-              // 🔍 Buscar la información original de esta imagen en el array de imágenes
-              let originalImageData = originalImageObjects.find(img => img.url.includes(imageName));
-
-              if (originalImageData) {
-                  // 🔄 Crear un nuevo objeto con la misma información, pero con la URL actualizada
-                  updatedImageObjects.push({
-                      ...originalImageData,
-                      url: newImageUrl
-                  });
-              } else {
-                  console.warn(`⚠️ No se encontró información previa para la imagen ${imageName}.`);
-                  updatedImageObjects.push({ url: newImageUrl });
-              }
+              // 🔄 Crear un nuevo objeto con la misma información, pero con la URL actualizada
+              updatedImageObjects.push({
+                  ...originalImageData,
+                  url: newImageUrl
+              });
 
               // ❌ Eliminar la imagen original después de moverla
               await deleteObject(oldImageRef);
@@ -345,14 +351,14 @@ private async recursivelyMoveImages_Acept(
       // 🔄 Recursividad: Buscar más subcarpetas dentro del folder
       for (const folder of folderContents.prefixes) {
           const newSourcePath = `${sourcePath}/${folder.name}`;
-          const newTargetPath = `${targetPath}/${folder.name}`;
-          await this.recursivelyMoveImages_Acept(newSourcePath, newTargetPath, originalImageObjects, updatedImageObjects);
+          await this.recursivelyMoveImagesToAccepted(newSourcePath, targetBasePath, originalImageObjects, updatedImageObjects);
       }
 
   } catch (error) {
       console.error(`❌ Error al mover imágenes en ${sourcePath}:`, error);
   }
 }
+
 
 
 
