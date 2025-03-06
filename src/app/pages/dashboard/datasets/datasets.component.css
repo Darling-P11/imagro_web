@@ -5,13 +5,6 @@
   width: 100%;
   padding: 0;
 }
-/* 🔹 Asegurar que `dataset-content` se mantenga en una fila */
-.dataset-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start; /* Alineación superior */
-  gap: 20px;
-}
 
 /* 🔹 Tarjeta Principal */
 .dataset-card {
@@ -22,34 +15,27 @@
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   margin: 20px auto;
   width: 100%;
-  max-width: calc(100% - 0px); /* ✅ Se ajusta al mismo ancho que el encabezado */
 }
-
-
 
 /* 🔹 Encabezado del Dataset */
 .dataset-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 15px;
 }
 
-.dataset-title h2 {
-  font-size: 2rem;
-  font-weight: bold;
-  color: #3d3d3d;
-  text-align: left;
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.dataset-title p {
-  font-size: 1rem;
-  color: #666;
-  margin-top: 5px;
-  text-align: left;
-}
-
-/* 🔹 Botón de descarga */
+/* 🔹 Botón de Descarga */
 .btn-download {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   background: black;
   color: white;
   padding: 10px 15px;
@@ -57,14 +43,32 @@
   border: none;
   cursor: pointer;
   font-weight: bold;
-  transition: background 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  transition: background 0.3s ease, transform 0.2s ease;
 }
 
 .btn-download:hover {
   background: #333;
+  transform: scale(1.05);
+}
+
+/* 🔹 Botón de Explorador */
+.btn-toggle-explorador {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #f0f0f0;
+  color: #333;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  font-weight: bold;
+}
+
+.btn-toggle-explorador.active {
+  background: #0ba27f;
+  color: white;
 }
 
 /* 🔹 Línea Divisoria */
@@ -78,7 +82,6 @@
 .dataset-path {
   font-size: 1rem;
   color: #3d3d3d;
-  text-align: left;
   margin-bottom: 15px;
 }
 
@@ -91,15 +94,56 @@
 .dataset-content {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   gap: 20px;
 }
 
-/* 🔹 Sección de Carpetas */
-.dataset-folders {
-  flex: 2;
+/* 🔹 Explorador de Datos */
+.dataset-sidebar {
+  width: 30%;
+  min-width: 250px;
   text-align: left;
+  border-left: 1px solid #ddd;
+  padding-left: 20px;
+  color: #3d3d3d;
+  transition: all 0.3s ease;
 }
 
+.dataset-sidebar.hidden {
+  display: none;
+}
+
+.carpeta-navegable {
+  cursor: pointer;
+  color: #0ba27f;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.carpeta-navegable:hover {
+  color: #088a66;
+}
+
+.file-tree {
+  list-style: none;
+  padding-left: 0;
+}
+
+.file-tree li {
+  margin-top: 5px;
+  font-weight: bold;
+}
+
+.file-tree ul {
+  margin-left: 15px;
+  font-weight: normal;
+  padding-left: 10px;
+  border-left: 1px solid #ddd;
+}
+
+/* 🔹 Grid de carpetas */
 .folders-grid {
   display: flex;
   flex-wrap: wrap;
@@ -121,61 +165,11 @@
   transform: scale(1.05);
 }
 
-.folder-card img {
-  width: 60px;
+.icon-folder {
+  font-size: 2rem;
+  color: #fbbf24;
 }
 
-.folder-card p {
-  font-weight: bold;
-  color: #333;
-}
-
-/* 🔹 Explorador de Datos y Resumen */
-.dataset-sidebar {
-  width: 30%;
-  text-align: left;
-  border-left: 1px solid #ddd;
-  padding-left: 20px;
-}
-
-.file-tree {
-  list-style: none;
-  padding-left: 0;
-}
-
-.file-tree li {
-  margin-top: 5px;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.file-tree ul {
-  margin-left: 15px;
-  font-weight: normal;
-  padding-left: 10px;
-  border-left: 1px solid #ddd;
-}
-
-.file-tree label {
-  display: flex;
-  align-items: center;
-}
-
-.file-tree input[type="checkbox"] {
-  margin-right: 5px;
-}
-
-.carpeta-navegable {
-  cursor: pointer;
-  color: #0ba27f;
-  transition: color 0.2s ease;
-}
-
-.carpeta-navegable:hover {
-  color: #088a66;
-}
-
-/* 🔹 Sección de Imágenes */
 /* 🔹 Sección de Imágenes */
 .imagenes-container {
   width: 100%;
@@ -185,14 +179,12 @@
   box-sizing: border-box;
 }
 
-/* 🔹 Ajustar la cuadrícula para que se acomode en el espacio disponible */
 .imagenes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 10px;
 }
 
-/* 🔹 Ajuste para cada tarjeta de imagen */
 .imagen-card {
   background: #ffffff;
   padding: 10px;
@@ -202,7 +194,11 @@
   transition: transform 0.3s ease;
 }
 
-.imagen-card img {
+.imagen-card:hover img {
+  transform: scale(1.1);
+}
+
+.imagen-real {
   width: 100%;
   height: auto;
   border-radius: 8px;
@@ -219,10 +215,141 @@
   text-overflow: ellipsis;
 }
 
-/* 🔹 Explorador de datos alineado con las imágenes */
-.dataset-sidebar {
-  width: 30%;
-  min-width: 250px;
-  box-sizing: border-box;
+/* 🔹 Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
+.modal-content {
+  background: #fff;
+  padding: 25px;
+  border-radius: 15px;
+  width: 450px;
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+  text-align: left;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.modal-list {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 15px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.btn-confirm {
+  background: #0ba27f;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-confirm:hover {
+  background: #088a66;
+}
+
+.btn-cancel {
+  background: #ff5b5b;
+  color: white;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-cancel:hover {
+  background: #e04a4a;
+}
+.modal-list ul {
+  padding-left: 20px;
+}
+
+.modal-list li {
+  list-style: none;
+}
+
+.modal-list label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  -webkit-user-select: none; /* Safari y iOS */
+-moz-user-select: none; /* Firefox */
+-ms-user-select: none; /* Internet Explorer/Edge */
+user-select: none; /* Estándar */
+/* Evita selección de texto accidental */
+}
+
+.modal-list label span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.ri-arrow-right-s-line, .ri-arrow-down-s-line {
+  cursor: pointer;
+  color: #555;
+  font-size: 18px;
+}
+/* ✅ Estilos del modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-container {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 450px;
+  text-align: left;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.loading-container {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 4px solid rgba(0, 0, 0, 0.2);
+  border-top: 4px solid #0ba27f;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
