@@ -1,49 +1,46 @@
 /* Estilo general del contenedor del mapa */
-.map-container {
+
+.georeference-container {
   width: 100%;
-  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  position: relative;
+  gap: 10px;
+  padding: 15px;
+  height: calc(100vh - 80px); /* Ajusta según la barra superior */
 }
 
-/* Controles del mapa */
-.map-controls {
+/* Contenedor de Herramientas (Botones y Selectores) */
+.map-tools {
+  width: 95%;
   display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 10px;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.9);
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.95);
   border-radius: 8px;
+  padding: 10px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  position: absolute;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
 }
 
 /* Botones */
-.map-controls button {
+.map-tools button {
   background: #0ba27f;
   color: white;
   border: none;
   padding: 8px 15px;
   font-size: 14px;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 6px;
   transition: background 0.3s ease-in-out;
 }
 
-.map-controls button:hover {
+.map-tools button:hover {
   background: #088a66;
 }
 
 /* Select */
-.map-controls select {
+.map-tools select {
   padding: 6px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -51,13 +48,73 @@
   cursor: pointer;
 }
 
-/* Estilo del Google Map */
-google-map {
-  width: 100%;
-  height: 600px;
+/* Contenedor del Mapa */
+.map-box {
+  width: 95%;
+  flex-grow: 1;
   border-radius: 10px;
+  overflow: hidden;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
+
+/* Estilos del Mapa */
+google-map {
+  width: 100%;
+  height: 100%;
+}
+/* Contenedor principal: debe ser del mismo alto que el sidebar */
+.georeference-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  height: 100vh; /* Ocupa toda la altura del viewport */
+  padding: 20px;
+}
+
+/* Contenedor de las funcionalidades */
+.map-tools-container {
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* Tarjeta de funcionalidades */
+.map-tools {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Contenedor del mapa */
+.map-box-container {
+  width: 100%;
+  max-width: 1200px;
+  flex-grow: 1; /* Hace que el mapa ocupe el espacio restante */
+}
+
+/* Mapa dentro de su contenedor */
+.map-box {
+  width: 100%;
+  height: 100%;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Google Maps */
+google-map {
+  width: 100%;
+  height: 100%;
+  border-radius: 15px;
+}
+
+
 
 /* Info Window (Pop-up de marcadores) */
 .info-content {
@@ -83,3 +140,4 @@ google-map {
   border-radius: 5px;
   border: 1px solid #ddd;
 }
+

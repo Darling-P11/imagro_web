@@ -41,8 +41,21 @@ export class GeoreferenceComponent implements OnInit, AfterViewInit {
   };
 
   markers: GeoMarker[] = [];
+  filteredMarkers: GeoMarker[] = [];
   selectedMarker: GeoMarker | null = null;
   userLocation: google.maps.LatLngLiteral | null = null;
+
+  //variable de filtros
+
+  // Variables para los filtros
+  searchCultivo: string = '';
+  searchEnfermedad: string = '';
+  searchUsuario: string = '';
+  startDate: string = '';
+  endDate: string = '';
+
+    //configs
+
 
   mapTypes: { label: string, value: google.maps.MapTypeId }[] = [
     { label: 'Normal', value: google.maps.MapTypeId.ROADMAP },
@@ -66,28 +79,26 @@ export class GeoreferenceComponent implements OnInit, AfterViewInit {
     try {
       const contribucionesRef = collectionGroup(this.firestore, 'aceptado');
       const contribucionesSnapshot = await getDocs(contribucionesRef);
-  
+
       let allMarkers: GeoMarker[] = [];
-  
+
       for (const contribucionDoc of contribucionesSnapshot.docs) {
         const data = contribucionDoc.data();
-  
+
         if (data['ubicacion'] && data['ubicacion']['latitud'] && data['ubicacion']['longitud']) {
-          const userId = data['usuario']; // ID del usuario
-  
-          // Buscar la foto de perfil en Firestore
+          const userId = data['usuario'];
+
           let profileImageUrl = '';
           if (userId) {
             const userDocRef = doc(this.firestore, `users/${userId}`);
             const userDocSnap = await getDocs(collection(this.firestore, `users`));
             userDocSnap.forEach(doc => {
               if (doc.id === userId) {
-                profileImageUrl = doc.data()['profileImage'] || ''; // Obtener la imagen de perfil
+                profileImageUrl = doc.data()['profileImage'] || '';
               }
             });
           }
-  
-          // Crear el marcador con la imagen de perfil
+
           const marker: GeoMarker = {
             latitud: data['ubicacion']['latitud'],
             longitud: data['ubicacion']['longitud'],
@@ -98,18 +109,47 @@ export class GeoreferenceComponent implements OnInit, AfterViewInit {
             estado: data['imagenes']?.[0]?.['estado'] || 'Sin especificar',
             tipo: data['imagenes']?.[0]?.['tipo'] || 'Sin especificar',
             url: data['imagenes']?.[0]?.['url'] || '',
-            profileImage: profileImageUrl, // Agregar la foto de perfil
+            profileImage: profileImageUrl,
           };
-  
+
           allMarkers.push(marker);
         }
       }
-  
+
       this.markers = allMarkers;
+      this.filteredMarkers = allMarkers;
     } catch (error) {
       console.error("❌ Error cargando marcadores:", error);
     }
   }
+   // Método para aplicar filtros
+  applyFilters() {
+    this.filteredMarkers = this.markers.filter(marker => {
+      const matchCultivo = this.searchCultivo
+        ? marker.cultivo?.toLowerCase().includes(this.searchCultivo.toLowerCase())
+        : true;
+      const matchEnfermedad = this.searchEnfermedad
+        ? marker.enfermedad?.toLowerCase().includes(this.searchEnfermedad.toLowerCase())
+        : true;
+      const matchUsuario = this.searchUsuario
+        ? marker.usuario?.toLowerCase().includes(this.searchUsuario.toLowerCase())
+        : true;
+
+      let matchFecha = true;
+      if (this.startDate || this.endDate) {
+        const markerFecha = new Date(marker.estado || '').getTime();
+        const start = this.startDate ? new Date(this.startDate).getTime() : null;
+        const end = this.endDate ? new Date(this.endDate).getTime() : null;
+
+        if (start && markerFecha < start) matchFecha = false;
+        if (end && markerFecha > end) matchFecha = false;
+      }
+
+      return matchCultivo && matchEnfermedad && matchUsuario && matchFecha;
+    });
+  }
+
+  
   
   //CARGA MARCADOR
   getMarkerIcon(profileImageUrl?: string): google.maps.Icon {
