@@ -1,18 +1,19 @@
 import { Component, ViewChild, ViewChildren, QueryList, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { GoogleMap, MapMarker, GoogleMapsModule, MapInfoWindow } from '@angular/google-maps';
-import { Firestore, collection, getDocs, query } from '@angular/fire/firestore';
+import { Firestore, collection, getDocs, doc, collectionGroup } from '@angular/fire/firestore';
 import { FormsModule } from '@angular/forms';
 
 interface GeoMarker {
   latitud: number;
   longitud: number;
-  cultivo: string;
-  enfermedad: string;
-  estado: string;
-  tipo: string;
-  url: string;
-  usuario: string; // Agregamos el usuario que subió la imagen
+  direccion?: string;
+  usuario: string;
+  cultivo?: string;
+  enfermedad?: string;
+  estado?: string;
+  tipo?: string;
+  url?: string;
 }
 
 @Component({
@@ -30,7 +31,7 @@ export class GeoreferenceComponent implements OnInit, AfterViewInit {
   zoom = 6;
   center: google.maps.LatLngLiteral = { lat: -1.8312, lng: -78.1834 }; // Ecuador
   options: google.maps.MapOptions = {
-    disableDefaultUI: false, 
+    disableDefaultUI: false,
     zoomControl: true,
     mapTypeControl: true,
     streetViewControl: false,
@@ -61,41 +62,42 @@ export class GeoreferenceComponent implements OnInit, AfterViewInit {
 
   async loadMarkersFromFirestore() {
     try {
-      const contribucionesRef = collection(this.firestore, `historialContribuciones`);
-      const usuariosSnapshot = await getDocs(contribucionesRef);
+      const contribucionesRef = collectionGroup(this.firestore, 'aceptado');
+      const contribucionesSnapshot = await getDocs(contribucionesRef);
   
       let allMarkers: GeoMarker[] = [];
   
-      for (const userDoc of usuariosSnapshot.docs) {
-        const userId = userDoc.id;
-        const userContribucionesRef = collection(this.firestore, `historialContribuciones/${userId}/enviado`);
-        const contribucionesSnapshot = await getDocs(userContribucionesRef);
+      console.log("📌 Total de contribuciones aceptadas encontradas:", contribucionesSnapshot.docs.length);
   
-        for (const contribucionDoc of contribucionesSnapshot.docs) {
-          const data = contribucionDoc.data();
-          const imagenes = data['imagenes'] || []; // Extraer correctamente el array de imágenes
+      for (const contribucionDoc of contribucionesSnapshot.docs) {
+        const data = contribucionDoc.data();
+        console.log("📌 Datos obtenidos de Firestore:", data);
   
-          imagenes.forEach((img: any) => {
-            allMarkers.push({
-              latitud: img.latitud || 0,
-              longitud: img.longitud || 0,
-              cultivo: img.cultivo || 'Desconocido',
-              enfermedad: img.enfermedad || 'No especificada',
-              estado: img.estado || 'No disponible',
-              tipo: img.tipo || 'General',
-              url: img.url || '',
-              usuario: userId, // Agregamos el ID del usuario
-            });
-          });
+        if (data['ubicacion'] && data['ubicacion']['latitud'] && data['ubicacion']['longitud']) {
+          const marker: GeoMarker = {
+            latitud: data['ubicacion']['latitud'],
+            longitud: data['ubicacion']['longitud'],
+            direccion: data['ubicacion']['direccion'] || 'Ubicación desconocida',
+            usuario: data['usuario'] || 'Desconocido',
+            cultivo: data['imagenes']?.[0]?.['cultivo'] || 'Sin especificar',
+            enfermedad: data['imagenes']?.[0]?.['enfermedad'] || 'Sin especificar',
+            estado: data['imagenes']?.[0]?.['estado'] || 'Sin especificar',
+            tipo: data['imagenes']?.[0]?.['tipo'] || 'Sin especificar',
+            url: data['imagenes']?.[0]?.['url'] || ''
+          };
+  
+          console.log("✅ Marcador agregado:", marker);
+          allMarkers.push(marker);
         }
       }
   
       this.markers = allMarkers;
-      console.log("✅ Marcadores cargados:", this.markers);
+      console.log("🎯 Total de marcadores cargados:", this.markers.length);
     } catch (error) {
       console.error("❌ Error cargando marcadores:", error);
     }
   }
+  
   
 
   getUserLocation() {

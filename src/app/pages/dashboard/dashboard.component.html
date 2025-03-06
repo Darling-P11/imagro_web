@@ -53,6 +53,13 @@
             <span *ngIf="!isSidebarCollapsed">Datasets</span>
           </a>
 
+          <a routerLink="/dashboard/georeference" 
+             class="sidebar__link" 
+             routerLinkActive="active-link">
+            <i class="ri-road-map-line"></i>
+            <span *ngIf="!isSidebarCollapsed">Georreferencias</span>
+          </a>
+
           <a routerLink="/dashboard/generate-models" 
              class="sidebar__link" 
              routerLinkActive="active-link">
@@ -60,12 +67,7 @@
             <span *ngIf="!isSidebarCollapsed">Generar modelos</span>
           </a>
 
-          <a routerLink="/dashboard/georeference" 
-             class="sidebar__link" 
-             routerLinkActive="active-link">
-            <i class="ri-road-map-line"></i>
-            <span *ngIf="!isSidebarCollapsed">Georreferencias</span>
-          </a>
+          
         </div>
       </div>
 

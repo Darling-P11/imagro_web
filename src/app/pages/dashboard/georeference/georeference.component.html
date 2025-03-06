@@ -5,26 +5,29 @@
 
     <label for="mapType">Tipo de Mapa:</label>
     <select id="mapType" [(ngModel)]="selectedMapType">
-      <option *ngFor="let type of mapTypes" [ngValue]="type.value">{{ type.label }}</option>
+      <option *ngFor="let type of mapTypes" [ngValue]="type.value">
+        {{ type.label }}
+      </option>
     </select>
   </div>
 
-  <google-map 
-    #map 
-    width="100%" 
-    height="600px" 
-    [center]="center" 
+  <google-map
+    #map
+    width="100%"
+    height="600px"
+    [center]="center"
     [zoom]="zoom"
     [options]="options"
-    [mapTypeId]="selectedMapType">
-    
-    <!-- Marcadores -->
+    [mapTypeId]="selectedMapType"
+  >
+    <!-- Marcadores con imagen de perfil en lugar del icono predeterminado -->
     <map-marker
       *ngFor="let marker of markers; let i = index"
       #markerRef="mapMarker"
       [position]="{ lat: marker.latitud, lng: marker.longitud }"
-      [title]="marker.cultivo"
-      (mapClick)="openInfoWindow(marker, markerRef)">
+      [title]="marker.cultivo || 'Sin información'"
+      (mapClick)="openInfoWindow(marker, markerRef)"
+    >
     </map-marker>
 
     <!-- Info Window Mejorado -->
@@ -34,7 +37,12 @@
         <p><strong>Enfermedad:</strong> {{ selectedMarker?.enfermedad }}</p>
         <p><strong>Estado:</strong> {{ selectedMarker?.estado }}</p>
         <p><strong>Tipo:</strong> {{ selectedMarker?.tipo }}</p>
-        <img *ngIf="selectedMarker?.url" [src]="selectedMarker?.url" width="150px" alt="Imagen de Cultivo">
+        <img
+          *ngIf="selectedMarker?.url"
+          [src]="selectedMarker?.url"
+          width="150px"
+          alt="Imagen de Cultivo"
+        />
       </div>
     </map-info-window>
   </google-map>
