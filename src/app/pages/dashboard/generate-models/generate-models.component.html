@@ -1,34 +1,107 @@
-<div class="container">
-  <!-- Contenedor del título -->
-  <div class="title-box">
-    <h2 class="title">Elige cómo quieres generar tu modelo</h2>
+<div class="modelo-wrapper">
+  <!-- 🔹 Contenedor de Selección de Cultivos -->
+  <div class="sidebar-container">
+    <h3>📁 Selecciona los cultivos</h3>
+
+    <!-- 🔹 Árbol de selección -->
+    <ul class="tree-list">
+      <li *ngFor="let carpeta of elementosDescarga">
+        <label (click)="toggleExpandir(carpeta, $event)">
+          <input
+            type="checkbox"
+            [(ngModel)]="carpeta.seleccionado"
+            (change)="toggleSeleccion(carpeta, $event)"
+          />
+          <span>
+            <i
+              *ngIf="carpeta.subelementos && !carpeta.abierto"
+              class="ri-folder-line"
+            ></i>
+            <i
+              *ngIf="carpeta.subelementos && carpeta.abierto"
+              class="ri-folder-open-line"
+            ></i>
+            {{ carpeta.nombre }}
+          </span>
+        </label>
+
+        <ul *ngIf="carpeta.abierto">
+          <ng-container
+            *ngTemplateOutlet="
+              mostrarSubcarpetas;
+              context: { carpetas: carpeta.subelementos }
+            "
+          ></ng-container>
+        </ul>
+      </li>
+    </ul>
   </div>
 
-  <!-- Contenedor principal -->
-  <div class="box">
-    <!-- Opción 1: Subida de ZIP -->
-    <div class="option-card">
-      <i class="ri-folder-zip-line icon-zip"></i>
-      <p class="description">
-        Sube un archivo <strong>.zip</strong> con la estructura de imágenes organizada en carpetas.
-      </p>
-      <span class="note">Solo .zip descargados de Imagro</span>
+  <!-- 🔹 Contenido principal de Generación de Modelo -->
+  <div class="modelo-container">
+    <h1>🤖 Generación de Modelo IA</h1>
+    <p>Selecciona los cultivos que deseas incluir en el modelo.</p>
+
+    <!-- 🔹 Botón de Entrenamiento con indicador de carga -->
+    <!-- 🔹 Botón de Entrenamiento con indicador de carga -->
+    <button
+      class="btn-train"
+      (click)="iniciarEntrenamiento()"
+      [disabled]="!tieneSeleccionadas() || cargandoModelo"
+    >
+      <i class="ri-brain-line"></i>
+      {{ cargandoModelo ? "Entrenando..." : "Entrenar Modelo" }}
+    </button>
+
+    <!-- 🔹 Indicador de progreso -->
+    <div *ngIf="cargandoModelo" class="loading-container">
+      <div class="spinner"></div>
+      <p>El modelo está entrenando. Esto puede tardar unos minutos...</p>
     </div>
 
-    <!-- Separador vertical con "o" -->
-    <div class="separator">
-      <div class="line"></div>
-      <span class="separator-text">o</span>
-      <div class="line"></div>
-    </div>
+    <!-- 🔹 Botón de descarga del modelo una vez entrenado -->
+    <!-- 🔹 Botón de descarga del modelo una vez entrenado -->
+<button
+*ngIf="modeloEntrenado"
+class="btn-download"
+(click)="descargarModelo()"
+>
+<i class="ri-download-line"></i> Descargar Modelo (JSON)
+</button>
 
-    <!-- Opción 2: Configuración Manual -->
-    <div class="option-card">
-      <i class="ri-settings-3-line icon-config"></i>
-      <p class="description">
-        Selecciona manualmente las imágenes y ajusta las configuraciones del modelo.
-      </p>
-      <span class="note">Recomendada</span>
-    </div>
   </div>
 </div>
+
+<!-- 🔹 Plantilla Recursiva para Subcarpetas -->
+<ng-template #mostrarSubcarpetas let-carpetas="carpetas">
+  <li *ngFor="let subcarpeta of carpetas">
+    <label (click)="toggleExpandir(subcarpeta, $event)">
+
+      <input
+        type="checkbox"
+        [(ngModel)]="subcarpeta.seleccionado"
+        (change)="toggleSeleccion(subcarpeta, $event)"
+      />
+      <span>
+        <i
+          *ngIf="subcarpeta.subelementos && !subcarpeta.abierto"
+          class="ri-folder-line"
+        ></i>
+        <i
+          *ngIf="subcarpeta.subelementos && subcarpeta.abierto"
+          class="ri-folder-open-line"
+        ></i>
+        {{ subcarpeta.nombre }}
+      </span>
+    </label>
+
+    <ul *ngIf="subcarpeta.abierto">
+      <ng-container
+        *ngTemplateOutlet="
+          mostrarSubcarpetas;
+          context: { carpetas: subcarpeta.subelementos }
+        "
+      ></ng-container>
+    </ul>
+  </li>
+</ng-template>

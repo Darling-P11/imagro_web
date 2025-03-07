@@ -9,7 +9,9 @@ import { RedirectIfLoggedInGuard } from './guards/redirect-if-logged-in.guard';
 import { ContributionsComponent } from './pages/admin/contributions/contributions.component';
 import { DefaultComponent } from './pages/dashboard/default/default.component';
 import { DatasetsComponent } from './pages/dashboard/datasets/datasets.component';
-import { GenerateModelsComponent } from './pages/dashboard/generate-models/generate-models.component';
+import { GenerarModeloComponent } from './pages/dashboard/generate-models/generate-models.component';
+
+
 import { GeoreferenceComponent } from './pages/dashboard/georeference/georeference.component';
 import { TagManagementComponent } from './pages/admin/tag-management/tag-management.component';
 
@@ -33,7 +35,8 @@ export const routes: Routes = [
       { path: '', redirectTo: 'default', pathMatch: 'full' }, // Redirección a Inicio
       { path: 'default', component: DefaultComponent, canActivate: [AuthGuard] },
       { path: 'datasets', component: DatasetsComponent, canActivate: [AuthGuard] },
-      { path: 'generate-models', component: GenerateModelsComponent, canActivate: [AuthGuard] },
+      { path: 'generate-models', component: GenerarModeloComponent, canActivate: [AuthGuard] }, // ✅ Usando el nombre correcto
+
       { path: 'georeference', component: GeoreferenceComponent, canActivate: [AuthGuard] },
       
       // Rutas exclusivas para administradores
