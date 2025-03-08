@@ -268,28 +268,5 @@ progress::-moz-progress-bar {
   gap: 5px;
 }
 
-/* 🔹 Loading en "Selecciona los cultivos" */
-.loading-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-size: 14px;
-  color: #555;
-  padding: 10px;
-}
-
-/* 🔹 Animación del spinner */
-.ri-spin {
-  font-size: 18px;
-  color: #0ba27f;
-  animation: spin 1s linear infinite;
-}
-
-/* 🔹 Keyframes para la rotación del spinner */
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
 
 
