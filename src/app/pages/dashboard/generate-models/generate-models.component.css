@@ -1,3 +1,4 @@
+/* 🔹 Contenedor Principal */
 .modelo-wrapper {
   display: flex;
   height: 100vh;
@@ -26,7 +27,17 @@
   text-align: center;
 }
 
-/* 🔹 Estilo del Árbol de Selección */
+/* 🔹 Scroll personalizado */
+.sidebar-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-container::-webkit-scrollbar-thumb {
+  background: #0ba27f;
+  border-radius: 6px;
+}
+
+/* 🔹 Árbol de Selección */
 .tree-list {
   list-style: none;
   padding-left: 0;
@@ -68,7 +79,7 @@ label input[type="checkbox"] {
   font-size: 18px;
 }
 
-/* 🔹 Contenedor principal */
+/* 🔹 Contenedor del Modelo */
 .modelo-container {
   flex: 1;
   padding: 40px;
@@ -118,16 +129,7 @@ label input[type="checkbox"] {
   transform: scale(1.05);
 }
 
-/* 🔹 Scroll personalizado */
-.sidebar-container::-webkit-scrollbar {
-  width: 6px;
-}
-
-.sidebar-container::-webkit-scrollbar-thumb {
-  background: #0ba27f;
-  border-radius: 6px;
-}
-/* 🔹 Indicador de carga */
+/* 🔹 Indicador de Carga */
 .loading-container {
   margin-top: 20px;
   text-align: center;
@@ -147,37 +149,68 @@ label input[type="checkbox"] {
   100% { transform: rotate(360deg); }
 }
 
-/* 🔹 Ajustes de diseño */
-.modelo-wrapper {
-  display: flex;
-  height: 100vh;
-  padding: 20px;
-  gap: 20px;
-}
-
-.sidebar-container {
-  width: 320px;
-  height: 95vh;
-  background: #ffffff;
-  padding: 20px;
-  overflow-y: auto;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  border: 1px solid #ddd;
-}
-
-.modelo-container {
-  flex: 1;
-  padding: 40px;
+/* 🔹 Barra de Progreso */
+.progress-container {
+  width: 100%;
   text-align: center;
-  background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  border: 1px solid #ddd;
+  margin-top: 15px;
 }
 
-/* 🔹 Botón de Entrenamiento */
-.btn-train {
+progress {
+  width: 100%;
+  height: 10px;
+  border-radius: 5px;
+  appearance: none;
+  border: none;
+}
+.training-message {
+  font-size: 14px;
+  color: #555;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+progress::-webkit-progress-bar {
+  background: #e0e0e0;
+  border-radius: 5px;
+}
+
+progress::-webkit-progress-value {
+  background: #0ba27f;
+  border-radius: 5px;
+  transition: width 0.4s ease-in-out;
+}
+progress::-moz-progress-bar {
+  background: #0ba27f;
+  border-radius: 5px;
+}
+.loading-container {
+  display: none;
+}
+/* 🔹 Mensaje de Éxito */
+.success-message {
+  background: #e6ffe6;
+  color: #0ba27f;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 16px;
+  text-align: center;
+  margin-top: 10px;
+  opacity: 0;
+  animation: fadeIn 1.5s ease-in-out forwards;
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* 🔹 Botón de Descarga con Animación */
+.btn-download {
   padding: 12px 20px;
   background: #0ba27f;
   color: white;
@@ -186,14 +219,77 @@ label input[type="checkbox"] {
   border-radius: 8px;
   cursor: pointer;
   transition: background 0.3s, transform 0.2s ease;
+  animation: bounce 1.5s infinite;
 }
 
-.btn-train:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-.btn-train:hover:not(:disabled) {
+.btn-download:hover {
   background: #088a66;
-  transform: scale(1.05);
 }
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* 🔹 Notificación Flotante */
+.toast-message {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0ba27f;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  animation: fadeInOut 3s ease-in-out;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(10px); }
+  10% { opacity: 1; transform: translateY(0); }
+  90% { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(-10px); }
+}
+
+/* 🔹 Mensaje de Advertencia */
+.warning-message {
+  background: #f8d7da;
+  color: #721c24;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+/* 🔹 Loading en "Selecciona los cultivos" */
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #555;
+  padding: 10px;
+}
+
+/* 🔹 Animación del spinner */
+.ri-spin {
+  font-size: 18px;
+  color: #0ba27f;
+  animation: spin 1s linear infinite;
+}
+
+/* 🔹 Keyframes para la rotación del spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+

@@ -53,60 +53,66 @@ export class TensorflowService {
   }
 
   // 🔹 Entrenar modelo con imágenes seleccionadas
-  async entrenarModelo(featureExtractor: tf.LayersModel, imagenes: string[], callbackProgreso: (progreso: number) => void) {
+  async entrenarModelo(
+    featureExtractor: tf.LayersModel,
+    imagenes: string[],
+    callbackProgreso: (progreso: number) => void
+  ) {
     console.log("🚀 Iniciando entrenamiento con MobileNet V1...");
     callbackProgreso(10);
-
+  
     try {
-        // 🔹 Cargar y procesar imágenes
-        const dataset = await this.cargarYPreprocesarImagenes(imagenes, featureExtractor);
-        callbackProgreso(30);
-
-        // 🔹 Crear el modelo de clasificación
-        const numClases = dataset.ys.shape[1] || 2; // Mínimo 2 clases
-        const model = tf.sequential();
-
-        // ✅ Ajuste: No aplanar la entrada, sino usar la misma forma del feature extractor
-        model.add(tf.layers.inputLayer({ inputShape: [7, 7, 256] })); // Usa la forma correcta
-
-        model.add(tf.layers.conv2d({ filters: 64, kernelSize: 3, activation: 'relu' }));
-        model.add(tf.layers.flatten()); // 🔹 Ahora sí se aplana después de la convolución
-        model.add(tf.layers.dense({ units: 128, activation: 'relu' }));
-        model.add(tf.layers.dropout({ rate: 0.3 })); // 🔹 Evitar sobreajuste
-        model.add(tf.layers.dense({ units: numClases, activation: 'softmax' })); // 🔹 Clasificación
-
-        model.compile({
-            optimizer: tf.train.adam(),
-            loss: 'categoricalCrossentropy',
-            metrics: ['accuracy']
-        });
-
-        console.log("✅ Modelo de Transfer Learning compilado.");
-
-        // 🔹 Entrenar el modelo
-        await model.fit(dataset.xs, dataset.ys, {
-            epochs: 10,
-            batchSize: 16,
-            validationSplit: 0.2,
-            callbacks: {
-                onEpochEnd: (epoch, logs) => {
-                    const progreso = Math.round((epoch + 1) / 10 * 100);
-                    callbackProgreso(progreso);
-                    console.log(`📊 Epoch ${epoch + 1}: Accuracy = ${logs?.['acc']}`);
-                }
-            }
-        });
-
-        console.log("🎉 Entrenamiento finalizado.");
-        callbackProgreso(100);
-        return model;
-
+      // 🔹 Cargar y procesar imágenes
+      const dataset = await this.cargarYPreprocesarImagenes(imagenes, featureExtractor);
+      callbackProgreso(30);
+  
+      // 🔹 Crear el modelo de clasificación
+      const numClases = dataset.ys.shape[1] || 2; // Mínimo 2 clases
+      const model = tf.sequential();
+  
+      // ✅ Ajuste: No aplanar la entrada, sino usar la misma forma del feature extractor
+      model.add(tf.layers.inputLayer({ inputShape: [7, 7, 256] })); // Usa la forma correcta
+  
+      model.add(tf.layers.conv2d({ filters: 64, kernelSize: 3, activation: 'relu' }));
+      model.add(tf.layers.flatten()); // 🔹 Ahora sí se aplana después de la convolución
+      model.add(tf.layers.dense({ units: 128, activation: 'relu' }));
+      model.add(tf.layers.dropout({ rate: 0.3 })); // 🔹 Evitar sobreajuste
+      model.add(tf.layers.dense({ units: numClases, activation: 'softmax' })); // 🔹 Clasificación
+  
+      // 🔹 Agregamos métricas adicionales
+      model.compile({
+        optimizer: tf.train.adam(),
+        loss: 'categoricalCrossentropy',
+        metrics: ['accuracy', 'precision', 'recall']
+      });
+  
+      console.log("✅ Modelo de Transfer Learning compilado.");
+  
+      // 🔹 Entrenar el modelo
+      await model.fit(dataset.xs, dataset.ys, {
+        epochs: 10,
+        batchSize: 16,
+        validationSplit: 0.2,
+        callbacks: {
+          onEpochEnd: (epoch, logs) => {
+            const progreso = Math.round(((epoch + 1) / 10) * 100);
+            callbackProgreso(progreso);
+            console.log(`📊 Epoch ${epoch + 1}: Accuracy = ${logs?.['accuracy']}`);
+            console.log(`📊 Precision: ${logs?.['precision']} | Recall: ${logs?.['recall']}`);
+          }
+        }
+      });
+  
+      console.log("🎉 Entrenamiento finalizado.");
+      callbackProgreso(100);
+      return model;
     } catch (error) {
-        console.error("❌ Error en entrenamiento:", error);
-        callbackProgreso(0);
-        return null;
+      console.error("❌ Error en entrenamiento:", error);
+      callbackProgreso(0);
+      return null;
     }
-}
+  }
+  
 
   
 
@@ -203,6 +209,18 @@ export class TensorflowService {
     return { xs: xsTensor, ys: ysTensor };
 }
 
+// PROBAR MODELO
+async cargarModeloGuardado() {
+  console.log("📥 Cargando modelo guardado...");
+  try {
+      const model = await tf.loadLayersModel('/assets/mobilenetv1_model.json'); // Ruta en tu proyecto
+      console.log("✅ Modelo cargado correctamente.");
+      return model;
+  } catch (error) {
+      console.error("❌ Error al cargar el modelo:", error);
+      return null;
+  }
+}
 
 
 

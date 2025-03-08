@@ -1,37 +1,27 @@
 <div class="modelo-wrapper">
   <!-- 🔹 Contenedor de Selección de Cultivos -->
   <div class="sidebar-container">
-    <h3>📁 Selecciona los cultivos</h3>
+    <h3><i class="ri-folder-line"></i> Selecciona los cultivos</h3>
 
-    <!-- 🔹 Árbol de selección -->
-    <ul class="tree-list">
+    <!-- 🔹 Loading mientras carga la estructura -->
+    <div *ngIf="cargandoCarpetas" class="loading-container">
+      <i class="ri-loader-4-line ri-spin"></i> Cargando carpetas...
+    </div>
+
+    <!-- 🔹 Árbol de selección (se oculta mientras se cargan las carpetas) -->
+    <ul *ngIf="!cargandoCarpetas" class="tree-list">
       <li *ngFor="let carpeta of elementosDescarga">
         <label (click)="toggleExpandir(carpeta, $event)">
-          <input
-            type="checkbox"
-            [(ngModel)]="carpeta.seleccionado"
-            (change)="toggleSeleccion(carpeta, $event)"
-          />
+          <input type="checkbox" [(ngModel)]="carpeta.seleccionado" (change)="toggleSeleccion(carpeta, $event)" />
           <span>
-            <i
-              *ngIf="carpeta.subelementos && !carpeta.abierto"
-              class="ri-folder-line"
-            ></i>
-            <i
-              *ngIf="carpeta.subelementos && carpeta.abierto"
-              class="ri-folder-open-line"
-            ></i>
+            <i *ngIf="carpeta.subelementos && !carpeta.abierto" class="ri-folder-line"></i>
+            <i *ngIf="carpeta.subelementos && carpeta.abierto" class="ri-folder-open-line"></i>
             {{ carpeta.nombre }}
           </span>
         </label>
 
         <ul *ngIf="carpeta.abierto">
-          <ng-container
-            *ngTemplateOutlet="
-              mostrarSubcarpetas;
-              context: { carpetas: carpeta.subelementos }
-            "
-          ></ng-container>
+          <ng-container *ngTemplateOutlet="mostrarSubcarpetas; context: { carpetas: carpeta.subelementos }"></ng-container>
         </ul>
       </li>
     </ul>
@@ -39,36 +29,41 @@
 
   <!-- 🔹 Contenido principal de Generación de Modelo -->
   <div class="modelo-container">
-    <h1>🤖 Generación de Modelo IA</h1>
+    <h1><i class="ri-robot-line"></i> Generación de Modelo IA</h1>
     <p>Selecciona los cultivos que deseas incluir en el modelo.</p>
 
+    <!-- 🔹 Mensaje de Advertencia si no hay mínimo 2 clases seleccionadas -->
+    <div *ngIf="!tieneMinimoDosClases()" class="warning-message">
+      <i class="ri-alert-line"></i> Debes seleccionar al menos 2 clases para entrenar el modelo.
+    </div>
+
     <!-- 🔹 Botón de Entrenamiento con indicador de carga -->
-    <!-- 🔹 Botón de Entrenamiento con indicador de carga -->
-    <button
-      class="btn-train"
-      (click)="iniciarEntrenamiento()"
-      [disabled]="!tieneSeleccionadas() || cargandoModelo"
-    >
+    <button class="btn-train" (click)="iniciarEntrenamiento()" 
+      [disabled]="!tieneSeleccionadas() || cargandoModelo || !tieneMinimoDosClases()">
       <i class="ri-brain-line"></i>
       {{ cargandoModelo ? "Entrenando..." : "Entrenar Modelo" }}
     </button>
 
-    <!-- 🔹 Indicador de progreso -->
-    <div *ngIf="cargandoModelo" class="loading-container">
-      <div class="spinner"></div>
-      <p>El modelo está entrenando. Esto puede tardar unos minutos...</p>
+    <!-- 🔹 Barra de Progreso Animada -->
+    <div *ngIf="cargandoModelo" class="progress-container">
+      <progress max="100" [value]="progresoEntrenamiento"></progress>
+      <p>{{ progresoEntrenamiento.toFixed(2) }}%</p>
+    </div>
+
+    <!-- 🔹 Mensaje de carga mientras se entrena -->
+    <p *ngIf="cargandoModelo" class="training-message">
+      <i class="ri-time-line"></i> El modelo está entrenando. Esto puede tardar unos minutos...
+    </p>
+
+    <!-- 🔹 Animación de Éxito cuando el modelo está listo -->
+    <div *ngIf="modeloEntrenado" class="success-message">
+      <i class="ri-check-double-line"></i> ¡Modelo generado con éxito!
     </div>
 
     <!-- 🔹 Botón de descarga del modelo una vez entrenado -->
-    <!-- 🔹 Botón de descarga del modelo una vez entrenado -->
-<button
-*ngIf="modeloEntrenado"
-class="btn-download"
-(click)="descargarModelo()"
->
-<i class="ri-download-line"></i> Descargar Modelo (JSON)
-</button>
-
+    <button *ngIf="modeloEntrenado" class="btn-download animated-bounce" (click)="descargarModelo()">
+      <i class="ri-download-line"></i> Descargar Modelo (JSON)
+    </button>
   </div>
 </div>
 
@@ -76,32 +71,21 @@ class="btn-download"
 <ng-template #mostrarSubcarpetas let-carpetas="carpetas">
   <li *ngFor="let subcarpeta of carpetas">
     <label (click)="toggleExpandir(subcarpeta, $event)">
-
-      <input
-        type="checkbox"
-        [(ngModel)]="subcarpeta.seleccionado"
-        (change)="toggleSeleccion(subcarpeta, $event)"
-      />
+      <input type="checkbox" [(ngModel)]="subcarpeta.seleccionado" (change)="toggleSeleccion(subcarpeta, $event)" />
       <span>
-        <i
-          *ngIf="subcarpeta.subelementos && !subcarpeta.abierto"
-          class="ri-folder-line"
-        ></i>
-        <i
-          *ngIf="subcarpeta.subelementos && subcarpeta.abierto"
-          class="ri-folder-open-line"
-        ></i>
+        <i *ngIf="subcarpeta.subelementos && !subcarpeta.abierto" class="ri-folder-line"></i>
+        <i *ngIf="subcarpeta.subelementos && subcarpeta.abierto" class="ri-folder-open-line"></i>
         {{ subcarpeta.nombre }}
       </span>
     </label>
 
     <ul *ngIf="subcarpeta.abierto">
-      <ng-container
-        *ngTemplateOutlet="
-          mostrarSubcarpetas;
-          context: { carpetas: subcarpeta.subelementos }
-        "
-      ></ng-container>
+      <ng-container *ngTemplateOutlet="mostrarSubcarpetas; context: { carpetas: subcarpeta.subelementos }"></ng-container>
     </ul>
   </li>
 </ng-template>
+
+<!-- 🔹 Notificación flotante cuando el modelo está listo -->
+<div *ngIf="notificacion" class="toast-message">
+  {{ notificacion }}
+</div>

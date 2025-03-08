@@ -25,6 +25,9 @@ export class GenerarModeloComponent implements OnInit {
   cargandoModelo: boolean = false;
   modeloEntrenado: any = null;
   progresoEntrenamiento: number = 0; // ✅ Inicializa en 0%
+  cargandoCarpetas: boolean = true;
+  notificacion: string | null = null; 
+  
 
   constructor(private tensorflowService: TensorflowService) {}
 
@@ -35,6 +38,9 @@ export class GenerarModeloComponent implements OnInit {
   async cargarEstructura() {
     this.elementosDescarga = [];
     const storage = getStorage();
+    this.cargandoCarpetas = true;
+    // Lógica de carga
+    
     const baseRef = ref(storage, this.rutaBase);
 
     try {
@@ -52,7 +58,9 @@ export class GenerarModeloComponent implements OnInit {
       }));
     } catch (error) {
       console.error("❌ Error cargando estructura:", error);
+      this.cargandoCarpetas = false;
     }
+    this.cargandoCarpetas = false;
   }
 
   async obtenerSubcarpetas(ruta: string): Promise<ElementoDescarga[]> {
@@ -93,7 +101,6 @@ export class GenerarModeloComponent implements OnInit {
     elemento.abierto = !elemento.abierto;
   }
   
-
   toggleSeleccion(elemento: ElementoDescarga, event: Event) {
     event.stopPropagation();
     elemento.seleccionado = !elemento.seleccionado;
@@ -104,7 +111,7 @@ export class GenerarModeloComponent implements OnInit {
     this.actualizarEstadoPadres();
   }
   
-  
+
   actualizarEstadoSubelementos(elemento: ElementoDescarga, estado: boolean) {
     elemento.seleccionado = estado;
     if (elemento.subelementos) {
@@ -129,7 +136,6 @@ export class GenerarModeloComponent implements OnInit {
     this.elementosDescarga.forEach(verificarEstadoPadre);
   }
   
-
   tieneSeleccionadas(): boolean {
     return this.elementosDescarga.some(el => el.seleccionado || (el.subelementos?.some(sub => sub.seleccionado)));
   }
@@ -157,42 +163,58 @@ export class GenerarModeloComponent implements OnInit {
     return seleccionados;
 }
 
-
   // 🔹 Entrenamiento del modelo con TensorFlow.js
   iniciarEntrenamiento() {
-    this.cargandoModelo = true;
-    console.log("⏳ Iniciando carga de modelo...");
-  
-    this.tensorflowService.cargarModeloPreEntrenado()
-      .then(modeloBase => {
-        if (!modeloBase) {  // ✅ Verifica si el modelo no se cargó correctamente
-          throw new Error("❌ No se pudo cargar el modelo preentrenado.");
-        }
-  
-        console.log("✅ Modelo cargado, listo para entrenamiento.");
-        const imagenesSeleccionadas = this.obtenerSeleccionados(this.elementosDescarga);
-        console.log("📂 Imágenes seleccionadas para entrenamiento:", imagenesSeleccionadas);
-  
-        return this.tensorflowService.entrenarModelo(
-          modeloBase,
-          imagenesSeleccionadas,
-          (progreso) => {  
-            this.progresoEntrenamiento = progreso;  // ✅ Actualiza el progreso en la UI
-          }
-        );
-        
-      })
-      .then(modeloEntrenado => {
-        if (modeloEntrenado) {
-          console.log("💾 Entrenamiento finalizado. Puedes descargar el modelo.");
-          this.modeloEntrenado = modeloEntrenado;
-        }
-      })
-      .catch(error => console.error("❌ Error durante el entrenamiento:", error))
-      .finally(() => this.cargandoModelo = false);
-  }
-  
+    if (!this.tieneMinimoDosClases()) {
+        this.mostrarNotificacion("⚠️ Debes seleccionar al menos 2 clases para entrenar el modelo.");
+        return;
+    }
 
+    this.cargandoModelo = true;
+    this.progresoEntrenamiento = 10; // 🔹 Inicia en 10%
+
+    console.log("⏳ Iniciando carga de modelo...");
+    
+    const intervaloProgreso = setInterval(() => {
+        if (this.progresoEntrenamiento < 90) { 
+            this.progresoEntrenamiento += Math.random() * 5; // 🔹 Incremento gradual
+        } else {
+            clearInterval(intervaloProgreso); // 🔹 Detiene el avance al 90%
+        }
+    }, 2000); // 🔹 Cada 2 segundos sube un poco
+
+    this.tensorflowService.cargarModeloPreEntrenado()
+        .then(modeloBase => {
+            if (!modeloBase) {
+                throw new Error("❌ No se pudo cargar el modelo preentrenado.");
+            }
+
+            console.log("✅ Modelo cargado, listo para entrenamiento.");
+            const imagenesSeleccionadas = this.obtenerSeleccionados(this.elementosDescarga);
+            console.log("📂 Imágenes seleccionadas para entrenamiento:", imagenesSeleccionadas);
+
+            return this.tensorflowService.entrenarModelo(
+                modeloBase,
+                imagenesSeleccionadas,
+                (progreso) => {
+                    this.progresoEntrenamiento = progreso;
+                }
+            );
+        })
+        .then(modeloEntrenado => {
+            if (modeloEntrenado) {
+                console.log("💾 Entrenamiento finalizado. Puedes descargar el modelo.");
+                this.modeloEntrenado = modeloEntrenado;
+                this.progresoEntrenamiento = 100;
+                this.mostrarNotificacion("✅ ¡Modelo generado con éxito!");
+            }
+        })
+        .catch(error => console.error("❌ Error durante el entrenamiento:", error))
+        .finally(() => {
+            this.cargandoModelo = false;
+            clearInterval(intervaloProgreso);
+        });
+}
   descargarModelo() {
     if (this.modeloEntrenado) {
       this.tensorflowService.guardarModelo(this.modeloEntrenado);
@@ -200,6 +222,23 @@ export class GenerarModeloComponent implements OnInit {
       console.error("❌ No hay un modelo entrenado para descargar.");
     }
   }
-  
-  
+  mostrarNotificacion(mensaje: string) {
+    this.notificacion = mensaje;
+    setTimeout(() => this.notificacion = "", 3000);
+  }
+  tieneMinimoDosClases(): boolean {
+    const seleccionadas = this.obtenerSeleccionados(this.elementosDescarga);
+    const categoriasUnicas = new Set(seleccionadas.map(ruta => {
+        const partes = ruta.split('/');
+        return partes[partes.length - 2]; // 🔹 Extrae la categoría desde la ruta
+    }));
+
+    if (categoriasUnicas.size < 2) {
+        this.notificacion = "⚠️ Selecciona al menos 2 clases para continuar.";
+        setTimeout(() => this.notificacion = "", 4000);
+        return false;
+    }
+
+    return true;
+}
 }
