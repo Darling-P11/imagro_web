@@ -64,6 +64,12 @@
     <button *ngIf="modeloEntrenado" class="btn-download animated-bounce" (click)="descargarModelo()">
       <i class="ri-download-line"></i> Descargar Modelo (JSON)
     </button>
+
+    <!-- 🔹 Botón para Descargar el PDF -->
+<button *ngIf="modeloEntrenado" class="btn-pdf" (click)="descargarReporteEntrenamiento()">
+  <i class="ri-file-pdf-line"></i> Descargar Reporte PDF
+</button>
+
   </div>
 </div>
 

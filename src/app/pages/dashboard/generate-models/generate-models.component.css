@@ -268,5 +268,20 @@ progress::-moz-progress-bar {
   gap: 5px;
 }
 
+.btn-pdf {
+  padding: 12px 20px;
+  background: #d9534f;
+  color: white;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s ease;
+  margin-top: 10px;
+}
+
+.btn-pdf:hover {
+  background: #c9302c;
+}
 
 

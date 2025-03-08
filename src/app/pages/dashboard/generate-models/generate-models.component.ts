@@ -140,105 +140,111 @@ export class GenerarModeloComponent implements OnInit {
     return this.elementosDescarga.some(el => el.seleccionado || (el.subelementos?.some(sub => sub.seleccionado)));
   }
 
-  obtenerSeleccionados(elementos: ElementoDescarga[]): string[] {
-    let seleccionados: string[] = [];
-    let categoriasSet = new Set<string>();
+    obtenerSeleccionados(elementos: ElementoDescarga[]): string[] {
+      let seleccionados: string[] = [];
+      let categoriasSet = new Set<string>();
 
-    elementos.forEach(el => {
-        if (el.seleccionado) {
-            seleccionados.push(el.ruta);
+      elementos.forEach(el => {
+          if (el.seleccionado) {
+              seleccionados.push(el.ruta);
 
-            // Agregar la categoría a la lista
-            const parts = el.ruta.split('/');
-            const categoria = parts[parts.length - 2];
-            categoriasSet.add(categoria);
-        }
-        if (el.subelementos) {
-            seleccionados.push(...this.obtenerSeleccionados(el.subelementos));
-        }
-    });
+              // Agregar la categoría a la lista
+              const parts = el.ruta.split('/');
+              const categoria = parts[parts.length - 2];
+              categoriasSet.add(categoria);
+          }
+          if (el.subelementos) {
+              seleccionados.push(...this.obtenerSeleccionados(el.subelementos));
+          }
+      });
 
-    console.log(`📊 Categorías seleccionadas: ${Array.from(categoriasSet)}`);
+      console.log(`📊 Categorías seleccionadas: ${Array.from(categoriasSet)}`);
 
-    return seleccionados;
-}
-
-  // 🔹 Entrenamiento del modelo con TensorFlow.js
-  iniciarEntrenamiento() {
-    if (!this.tieneMinimoDosClases()) {
-        this.mostrarNotificacion("⚠️ Debes seleccionar al menos 2 clases para entrenar el modelo.");
-        return;
-    }
-
-    this.cargandoModelo = true;
-    this.progresoEntrenamiento = 10; // 🔹 Inicia en 10%
-
-    console.log("⏳ Iniciando carga de modelo...");
-    
-    const intervaloProgreso = setInterval(() => {
-        if (this.progresoEntrenamiento < 90) { 
-            this.progresoEntrenamiento += Math.random() * 5; // 🔹 Incremento gradual
-        } else {
-            clearInterval(intervaloProgreso); // 🔹 Detiene el avance al 90%
-        }
-    }, 2000); // 🔹 Cada 2 segundos sube un poco
-
-    this.tensorflowService.cargarModeloPreEntrenado()
-        .then(modeloBase => {
-            if (!modeloBase) {
-                throw new Error("❌ No se pudo cargar el modelo preentrenado.");
-            }
-
-            console.log("✅ Modelo cargado, listo para entrenamiento.");
-            const imagenesSeleccionadas = this.obtenerSeleccionados(this.elementosDescarga);
-            console.log("📂 Imágenes seleccionadas para entrenamiento:", imagenesSeleccionadas);
-
-            return this.tensorflowService.entrenarModelo(
-                modeloBase,
-                imagenesSeleccionadas,
-                (progreso) => {
-                    this.progresoEntrenamiento = progreso;
-                }
-            );
-        })
-        .then(modeloEntrenado => {
-            if (modeloEntrenado) {
-                console.log("💾 Entrenamiento finalizado. Puedes descargar el modelo.");
-                this.modeloEntrenado = modeloEntrenado;
-                this.progresoEntrenamiento = 100;
-                this.mostrarNotificacion("✅ ¡Modelo generado con éxito!");
-            }
-        })
-        .catch(error => console.error("❌ Error durante el entrenamiento:", error))
-        .finally(() => {
-            this.cargandoModelo = false;
-            clearInterval(intervaloProgreso);
-        });
-}
-  descargarModelo() {
-    if (this.modeloEntrenado) {
-      this.tensorflowService.guardarModelo(this.modeloEntrenado);
-    } else {
-      console.error("❌ No hay un modelo entrenado para descargar.");
-    }
+      return seleccionados;
   }
-  mostrarNotificacion(mensaje: string) {
-    this.notificacion = mensaje;
-    setTimeout(() => this.notificacion = "", 3000);
+
+    // 🔹 Entrenamiento del modelo con TensorFlow.js
+    iniciarEntrenamiento() {
+      if (!this.tieneMinimoDosClases()) {
+          this.mostrarNotificacion("⚠️ Debes seleccionar al menos 2 clases para entrenar el modelo.");
+          return;
+      }
+
+      this.cargandoModelo = true;
+      this.progresoEntrenamiento = 10; // 🔹 Inicia en 10%
+
+      console.log("⏳ Iniciando carga de modelo...");
+      
+      const intervaloProgreso = setInterval(() => {
+          if (this.progresoEntrenamiento < 90) { 
+              this.progresoEntrenamiento += Math.random() * 5; // 🔹 Incremento gradual
+          } else {
+              clearInterval(intervaloProgreso); // 🔹 Detiene el avance al 90%
+          }
+      }, 2000); // 🔹 Cada 2 segundos sube un poco
+
+      this.tensorflowService.cargarModeloPreEntrenado()
+          .then(modeloBase => {
+              if (!modeloBase) {
+                  throw new Error("❌ No se pudo cargar el modelo preentrenado.");
+              }
+
+              console.log("✅ Modelo cargado, listo para entrenamiento.");
+              const imagenesSeleccionadas = this.obtenerSeleccionados(this.elementosDescarga);
+              console.log("📂 Imágenes seleccionadas para entrenamiento:", imagenesSeleccionadas);
+
+              return this.tensorflowService.entrenarModelo(
+                  modeloBase,
+                  imagenesSeleccionadas,
+                  (progreso) => {
+                      this.progresoEntrenamiento = progreso;
+                  }
+              );
+          })
+          .then(modeloEntrenado => {
+              if (modeloEntrenado) {
+                  console.log("💾 Entrenamiento finalizado. Puedes descargar el modelo.");
+                  this.modeloEntrenado = modeloEntrenado;
+                  this.progresoEntrenamiento = 100;
+                  this.mostrarNotificacion("✅ ¡Modelo generado con éxito!");
+              }
+          })
+          .catch(error => console.error("❌ Error durante el entrenamiento:", error))
+          .finally(() => {
+              this.cargandoModelo = false;
+              clearInterval(intervaloProgreso);
+          });
   }
-  tieneMinimoDosClases(): boolean {
-    const seleccionadas = this.obtenerSeleccionados(this.elementosDescarga);
-    const categoriasUnicas = new Set(seleccionadas.map(ruta => {
-        const partes = ruta.split('/');
-        return partes[partes.length - 2]; // 🔹 Extrae la categoría desde la ruta
-    }));
-
-    if (categoriasUnicas.size < 2) {
-        this.notificacion = "⚠️ Selecciona al menos 2 clases para continuar.";
-        setTimeout(() => this.notificacion = "", 4000);
-        return false;
+    descargarModelo() {
+      if (this.modeloEntrenado) {
+        this.tensorflowService.guardarModelo(this.modeloEntrenado);
+      } else {
+        console.error("❌ No hay un modelo entrenado para descargar.");
+      }
     }
+    mostrarNotificacion(mensaje: string) {
+      this.notificacion = mensaje;
+      setTimeout(() => this.notificacion = "", 3000);
+    }
+    tieneMinimoDosClases(): boolean {
+      const seleccionadas = this.obtenerSeleccionados(this.elementosDescarga);
+      const categoriasUnicas = new Set(seleccionadas.map(ruta => {
+          const partes = ruta.split('/');
+          return partes[partes.length - 2]; // 🔹 Extrae la categoría desde la ruta
+      }));
 
-    return true;
-}
+      if (categoriasUnicas.size < 2) {
+          this.notificacion = "⚠️ Selecciona al menos 2 clases para continuar.";
+          setTimeout(() => this.notificacion = "", 4000);
+          return false;
+      }
+
+      return true;
+  }
+
+  //funcion al boton de generar pdf
+  descargarReporteEntrenamiento() {
+    this.tensorflowService.generarReporteEntrenamiento();
+  }
+
 }
