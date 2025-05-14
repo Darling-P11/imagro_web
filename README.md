@@ -1,59 +1,120 @@
-# ImagroWeb
+![Banner](https://imgur.com/2BEXRlN.png)
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.7.
+---
 
-## Development server
+**Imagro web** es una plataforma que complementa la aplicación móvil de imagro. Esta interfaz web permite visualizar y administrar el dataset generado desde la app móvil, visualizar geográficamente las contribuciones aprobadas y generar modelos de inteligencia artificial basados en imágenes reales de cultivos.
 
-To start a local development server, run:
+El sistema está diseñado para investigadores, docentes, estudiantes y productores agrícolas, facilitando el análisis visual, el entrenamiento de modelos y la toma de decisiones basadas en datos reales.
+
+---
+
+## ⚙️ Tecnologías utilizadas
+
+| Herramienta         | Versión         |
+|---------------------|-----------------|
+| Angular             | 19.1.7          |
+| Firebase            | Auth, Firestore, Storage |
+| Google Maps API     | Última versión  |
+| TensorFlow.js       | Integración personalizada |
+| Librerías UI        | TailwindCSS, Remix Icons |
+
+---
+
+## 🚀 Instalación y primeros pasos
+
+### 📦 **Instala las dependencias**
+
+```bash
+npm install
+```
+
+### 🧪 **Inicia el entorno de desarrollo**
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+---
 
-## Code scaffolding
+### 🔧 **Configuración de Firebase**
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+1. Crea un proyecto en [Firebase Console](https://console.firebase.google.com/) o usa el mismo de la app móvil.
+2. Agrega la configuración en el archivo `src/environments/environment.ts`:
 
-```bash
-ng generate component component-name
+```ts
+export const environment = {
+  production: false,
+  firebaseConfig: {
+    apiKey: "TU_API_KEY",
+    authDomain: "TU_AUTH_DOMAIN",
+    projectId: "TU_PROJECT_ID",
+    storageBucket: "TU_STORAGE_BUCKET",
+    messagingSenderId: "TU_SENDER_ID",
+    appId: "TU_APP_ID"
+  }
+};
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+3. Asegúrate de habilitar:
+
+   - Firebase Authentication (Email/Password)  
+   - Cloud Firestore  
+   - Firebase Storage
+
+---
+
+### 🌐 **Despliegue en Producción**
+
+La aplicación web se encuentra desplegada y accesible desde:
+
+➡️ [https://imagroweb.netlify.app](https://imagroweb.netlify.app)
+
+---
+
+### 🧩 **Módulos principales**
+
+- **Visualización de contribuciones georreferenciadas**  
+- **Exploración de datasets con imágenes verificadas**  
+- **Generación y descarga de modelos IA (MobileNet v1)**  
+- **Gestión de etiquetas y control de calidad de datos**  
+- **Panel administrativo por rol (usuario/admin)**
+
+---
+
+### 🤝 **¿Cómo contribuir?**
+
+1. Haz un fork del repositorio.
+2. Crea una nueva rama basada en `main`:
 
 ```bash
-ng generate --help
+git checkout -b feature/nueva-funcionalidad
 ```
 
-## Building
-
-To build the project run:
+3. Realiza tus cambios y haz commit:
 
 ```bash
-ng build
+git commit -m "Agrega nueva funcionalidad"
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+4. Haz push a tu rama:
 
 ```bash
-ng test
+git push origin feature/nueva-funcionalidad
 ```
 
-## Running end-to-end tests
+5. Abre una Pull Request describiendo los cambios realizados.
 
-For end-to-end (e2e) testing, run:
+📄 Consulta la guía completa en `CONTRIBUTING.md`.
 
-```bash
-ng e2e
-```
+---
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### 📄 **Licencia**
 
-## Additional Resources
+Este repositorio está licenciado bajo la **GNU General Public License v3.0**. Consulta el archivo `LICENSE` para más detalles.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+---
+
+### ✉️ **Contacto**
+
+**Desarrollado por:** Kevin Darling Ponce Rivera  
+📧 **Correo:** kevinponce2001@hotmail.com
