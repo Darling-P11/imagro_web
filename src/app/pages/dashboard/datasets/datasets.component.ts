@@ -23,6 +23,7 @@ interface ElementoDescarga {
   seleccionado: boolean;
   subelementos?: ElementoDescarga[];
   abierto?: boolean;
+  
 }
 
 
@@ -47,6 +48,16 @@ export class DatasetsComponent implements OnInit {
   modalDescargaAbierto: boolean = false;
   modalAbierto: boolean = false;
   elementosDescarga: ElementoDescarga[] = [];
+  imagenesCargando: boolean = false;
+  carpetasCargando: boolean = false;
+  opcionesDescargaAbiertas: boolean = false;
+  descargandoCarpeta: boolean = false;
+  cargandoModalManual: boolean = false;
+
+
+
+
+
   
 
   constructor() {}
@@ -61,9 +72,11 @@ export class DatasetsComponent implements OnInit {
     this.totalArchivos = 0;
     this.totalGB = 0;
     this.imagenes = [];
+    
+    this.imagenesCargando = true;
     const storage = getStorage();
     const carpetaRef = ref(storage, ruta);
-
+    this.carpetasCargando = true;
     try {
       const listado = await listAll(carpetaRef);
 
@@ -99,6 +112,10 @@ export class DatasetsComponent implements OnInit {
 
     } catch (error) {
       console.error("❌ Error cargando carpetas e imágenes:", error);
+    }
+      finally {
+      this.imagenesCargando = false; //  Desactivar loading
+      this.carpetasCargando = false;
     }
   }
 
@@ -251,9 +268,57 @@ export class DatasetsComponent implements OnInit {
   
 
   abrirModal() {
-    this.modalAbierto = true;
-    this.cargarEstructuraDescarga(); // 🔹 Cargar datos en tiempo real
+    this.opcionesDescargaAbiertas = true
+    this.modalAbierto = false;
+
+    
   }
+  abrirModalManual() {
+  this.modalAbierto = true;             // ahora sí abre el modal real
+  this.opcionesDescargaAbiertas = false; // cierra el modal de opciones
+  this.cargarEstructuraDescarga();  
+  this.cargandoModalManual = true; 
+  this.cargarEstructuraDescarga().then(() => {
+    this.cargandoModalManual = false; //  desactiva loading cuando termina
+  });   // carga el arbol de carpetas
+}
+
+
+  cerrarOpcionesDescarga() {
+  this.opcionesDescargaAbiertas = false;
+}
+async descargarCarpetaActual() {
+  this.opcionesDescargaAbiertas = false;
+  this.descargandoCarpeta = true;
+
+  try {
+    const zip = new JSZip();
+    const archivos = await this.obtenerArchivosDeCarpeta(this.rutaActual);
+
+    if (archivos.length === 0) {
+      alert(" No se encontraron archivos en esta carpeta.");
+      return;
+    }
+
+    const cantidad = await this.agregarArchivosAlZip(archivos, zip);
+
+    if (cantidad === 0) {
+      alert(" No se pudieron agregar archivos al ZIP.");
+      return;
+    }
+
+    const blob = await zip.generateAsync({ type: 'blob' });
+    saveAs(blob, 'carpeta_actual.zip');
+
+    console.log(" Carpeta actual descargada.");
+  } catch (error) {
+    console.error(" Error al descargar carpeta actual:", error);
+    alert(" Hubo un error al descargar la carpeta actual.");
+  } finally {
+    this.descargandoCarpeta = false; //  Ocultar loading
+  }
+}
+
   
 
   cerrarModal() {
@@ -282,7 +347,8 @@ export class DatasetsComponent implements OnInit {
     }
   
     console.log("📥 Descargando elementos seleccionados:", seleccionados);
-  
+    this.descargandoCarpeta = true; // Mostrar modal de carga
+
     try {
       const zip = new JSZip();
       let archivosFinales: string[] = [];
@@ -297,7 +363,7 @@ export class DatasetsComponent implements OnInit {
         }
       }
   
-      console.log("📂 Archivos reales que se descargarán:", archivosFinales);
+      console.log(" Archivos reales que se descargarán:", archivosFinales);
   
       if (archivosFinales.length === 0) {
         alert("⚠ No se encontraron archivos en las rutas seleccionadas.");
@@ -307,7 +373,7 @@ export class DatasetsComponent implements OnInit {
       const archivosDescargados = await this.agregarArchivosAlZip(archivosFinales, zip);
   
       if (archivosDescargados === 0) {
-        alert("⚠ No se pudieron agregar archivos al ZIP.");
+        alert(" No se pudieron agregar archivos al ZIP.");
         return;
       }
   
@@ -315,12 +381,14 @@ export class DatasetsComponent implements OnInit {
       const zipBlob = await zip.generateAsync({ type: 'blob' });
       saveAs(zipBlob, 'datasets_seleccionados.zip');
   
-      console.log("✅ ZIP generado y descargado con éxito.");
+      console.log(" ZIP generado y descargado con éxito.");
       this.cerrarModal();
     } catch (error) {
-      console.error("❌ Error al generar el ZIP:", error);
-      alert("❌ Ocurrió un error al generar el ZIP. Revisa la consola para más detalles.");
-    }
+      console.error(" Error al generar el ZIP:", error);
+      alert(" Ocurrió un error al generar el ZIP. Revisa la consola para más detalles.");
+    }finally {
+    this.descargandoCarpeta = false; // Ocultar modal de carga
+  }
   }
   
   

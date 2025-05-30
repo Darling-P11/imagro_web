@@ -4,19 +4,27 @@
     <div class="dataset-header">
       <div class="dataset-title">
         <h2>Dataset de Imagro</h2>
-        <p>Explore una completa colección de datos sobre cultivos vegetales para investigación y análisis.</p>
+        <p>
+          Explore una completa colección de datos sobre cultivos vegetales para
+          investigación y análisis.
+        </p>
       </div>
       <div class="header-actions">
         <button class="btn-download" (click)="abrirModal()">
-          <i class="ri-download-cloud-2-fill"></i> Download
+          <i class="ri-download-cloud-2-fill"></i> Descargar
         </button>
-        <button 
-          class="btn-toggle-explorador" 
+        <button
+          class="btn-toggle-explorador"
           type="button"
           aria-label="Toggle Explorador"
           title="Mostrar/Ocultar Explorador"
-          (click)="toggleExplorador()">
-          <i [class]="exploradorAbierto ? 'ri-folder-open-line' : 'ri-folder-3-line'"></i>
+          (click)="toggleExplorador()"
+        >
+          <i
+            [class]="
+              exploradorAbierto ? 'ri-folder-open-line' : 'ri-folder-3-line'
+            "
+          ></i>
           <span class="explorador-text">Explorador</span>
         </button>
       </div>
@@ -27,29 +35,50 @@
     <!-- 🔹 Ruta Actual -->
     <p class="dataset-path">
       <strong>Ruta:</strong>
-      <span class="ruta-actual">{{ rutaActual }} ({{ carpetas.length }} directorios)</span>
+      <span class="ruta-actual"
+        >{{ rutaActual }} ({{ carpetas.length }} directorios)</span
+      >
     </p>
 
     <!-- 🔹 Contenido Principal -->
     <div class="dataset-content">
       <!-- 🔹 Sección de Carpetas e Imágenes -->
       <div class="dataset-folders">
+        <div class="loading-container" *ngIf="imagenesCargando">
+          <div class="spinner"></div>
+          <p>Cargando información...</p>
+        </div>
         <!-- 🔹 Galería de Imágenes -->
         <div class="imagenes-container" *ngIf="imagenes.length > 0">
           <h3>Imágenes en esta carpeta</h3>
-          <div class="imagenes-grid">
-            <div class="imagen-card" *ngFor="let imagen of imagenes">
-              <img [src]="imagen.url" [alt]="imagen.nombre" class="imagen-real" />
-              <p>{{ imagen.nombre }}</p>
+          <div
+            class="imagenes-container"
+            *ngIf="!imagenesCargando && imagenes.length > 0"
+          >
+            <div class="imagenes-grid">
+              <div class="imagen-card" *ngFor="let imagen of imagenes">
+                <img
+                  [src]="imagen.url"
+                  [alt]="imagen.nombre"
+                  class="imagen-real"
+                />
+                <p>{{ imagen.nombre }}</p>
+              </div>
             </div>
           </div>
         </div>
 
         <!-- 🔹 Listado de Carpetas -->
-        <div class="folders-grid">
-          <div class="folder-card" *ngFor="let carpeta of carpetas" (click)="navegar(carpeta.ruta)">
-            <i class="ri-folder-fill icon-folder"></i>
-            <p>{{ carpeta.nombre }}</p>
+        <div class="folders-grid" *ngIf="!carpetasCargando">
+          <div class="folders-grid">
+            <div
+              class="folder-card"
+              *ngFor="let carpeta of carpetas"
+              (click)="navegar(carpeta.ruta)"
+            >
+              <i class="ri-folder-fill icon-folder"></i>
+              <p>{{ carpeta.nombre }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -57,15 +86,24 @@
       <!-- 🔹 Explorador de Datos -->
       <div class="dataset-sidebar" [class.hidden]="!exploradorAbierto">
         <h3>Explorador de datos</h3>
+
         <ul class="file-tree">
           <li *ngFor="let carpeta of estructuraExplorador">
             <span class="carpeta-navegable" (click)="toggleCarpeta(carpeta)">
               <i *ngIf="!carpeta.abierta" class="ri-add-circle-line"></i>
-              <i *ngIf="carpeta.abierta" class="ri-indeterminate-circle-line"></i>
+              <i
+                *ngIf="carpeta.abierta"
+                class="ri-indeterminate-circle-line"
+              ></i>
               <i class="ri-folder-open-fill"></i> {{ carpeta.nombre }}
             </span>
             <ul *ngIf="carpeta.abierta">
-              <ng-container *ngTemplateOutlet="mostrarSubcarpetas; context: { carpetas: carpeta.subcarpetas }"></ng-container>
+              <ng-container
+                *ngTemplateOutlet="
+                  mostrarSubcarpetas;
+                  context: { carpetas: carpeta.subcarpetas }
+                "
+              ></ng-container>
             </ul>
           </li>
         </ul>
@@ -85,13 +123,28 @@
 <div class="modal-overlay" *ngIf="modalAbierto">
   <div class="modal-content">
     <h3>Seleccione los elementos a descargar</h3>
+    <div class="loading-container" *ngIf="cargandoModalManual">
+      <div class="spinner"></div>
+      <p>Cargando estructura de carpetas...</p>
+    </div>
+    <div *ngIf="!cargandoModalManual">
     <ul class="modal-list">
       <li *ngFor="let elemento of elementosDescarga">
         <label (click)="toggleExpandir(elemento)">
-          <input type="checkbox" [(ngModel)]="elemento.seleccionado" (change)="toggleSeleccion(elemento)" />
+          <input
+            type="checkbox"
+            [(ngModel)]="elemento.seleccionado"
+            (change)="toggleSeleccion(elemento)"
+          />
           <span>
-            <i *ngIf="elemento.subelementos && !elemento.abierto" class="ri-arrow-right-s-line"></i>
-            <i *ngIf="elemento.subelementos && elemento.abierto" class="ri-arrow-down-s-line"></i>
+            <i
+              *ngIf="elemento.subelementos && !elemento.abierto"
+              class="ri-arrow-right-s-line"
+            ></i>
+            <i
+              *ngIf="elemento.subelementos && elemento.abierto"
+              class="ri-arrow-down-s-line"
+            ></i>
             {{ elemento.nombre }}
           </span>
         </label>
@@ -99,10 +152,20 @@
         <ul *ngIf="elemento.abierto">
           <li *ngFor="let subelemento of elemento.subelementos">
             <label (click)="toggleExpandir(subelemento)">
-              <input type="checkbox" [(ngModel)]="subelemento.seleccionado" (change)="toggleSeleccion(subelemento)" />
+              <input
+                type="checkbox"
+                [(ngModel)]="subelemento.seleccionado"
+                (change)="toggleSeleccion(subelemento)"
+              />
               <span>
-                <i *ngIf="subelemento.subelementos && !subelemento.abierto" class="ri-arrow-right-s-line"></i>
-                <i *ngIf="subelemento.subelementos && subelemento.abierto" class="ri-arrow-down-s-line"></i>
+                <i
+                  *ngIf="subelemento.subelementos && !subelemento.abierto"
+                  class="ri-arrow-right-s-line"
+                ></i>
+                <i
+                  *ngIf="subelemento.subelementos && subelemento.abierto"
+                  class="ri-arrow-down-s-line"
+                ></i>
                 {{ subelemento.nombre }}
               </span>
             </label>
@@ -110,10 +173,20 @@
             <ul *ngIf="subelemento.abierto">
               <li *ngFor="let subsub of subelemento.subelementos">
                 <label (click)="toggleExpandir(subsub)">
-                  <input type="checkbox" [(ngModel)]="subsub.seleccionado" (change)="toggleSeleccion(subsub)" />
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="subsub.seleccionado"
+                    (change)="toggleSeleccion(subsub)"
+                  />
                   <span>
-                    <i *ngIf="subsub.subelementos && !subsub.abierto" class="ri-arrow-right-s-line"></i>
-                    <i *ngIf="subsub.subelementos && subsub.abierto" class="ri-arrow-down-s-line"></i>
+                    <i
+                      *ngIf="subsub.subelementos && !subsub.abierto"
+                      class="ri-arrow-right-s-line"
+                    ></i>
+                    <i
+                      *ngIf="subsub.subelementos && subsub.abierto"
+                      class="ri-arrow-down-s-line"
+                    ></i>
                     {{ subsub.nombre }}
                   </span>
                 </label>
@@ -121,7 +194,10 @@
                 <ul *ngIf="subsub.abierto">
                   <li *ngFor="let subsubsub of subsub.subelementos">
                     <label>
-                      <input type="checkbox" [(ngModel)]="subsubsub.seleccionado" />
+                      <input
+                        type="checkbox"
+                        [(ngModel)]="subsubsub.seleccionado"
+                      />
                       {{ subsubsub.nombre }}
                     </label>
                   </li>
@@ -132,14 +208,46 @@
         </ul>
       </li>
     </ul>
+    </div>
 
     <div class="modal-actions">
-      <button class="btn-confirm" (click)="confirmarDescarga()">Confirmar</button>
+      <button class="btn-confirm" (click)="confirmarDescarga()">
+        Confirmar
+      </button>
       <button class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
     </div>
   </div>
 </div>
 
+<!-- 🔹 Diálogo de opciones de descarga -->
+<div class="modal-overlay" *ngIf="opcionesDescargaAbiertas">
+  <div class="modal-content">
+    <h3>¿Qué desea descargar?</h3>
+    <p>
+      Actualmente está en: <strong>{{ rutaActual }}</strong>
+    </p>
+
+    <div class="modal-actions">
+      <button class="btn-confirm" (click)="descargarCarpetaActual()">
+        Descargar esta carpeta
+      </button>
+      <button class="btn-confirm" (click)="abrirModalManual()">
+        Elegir manualmente
+      </button>
+      <button class="btn-cancel" (click)="cerrarOpcionesDescarga()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de carga de descarga -->
+<div class="modal-overlay" *ngIf="descargandoCarpeta">
+  <div class="modal-content loading">
+    <div class="spinner"></div>
+    <p>Generando archivo ZIP…</p>
+  </div>
+</div>
 
 <!-- 🔹 Plantilla Recursiva para Subcarpetas -->
 <ng-template #mostrarSubcarpetas let-carpetas="carpetas">
@@ -150,7 +258,12 @@
       <i class="ri-folder-open-fill"></i> {{ subcarpeta.nombre }}
     </span>
     <ul *ngIf="subcarpeta.abierta">
-      <ng-container *ngTemplateOutlet="mostrarSubcarpetas; context: { carpetas: subcarpeta.subcarpetas }"></ng-container>
+      <ng-container
+        *ngTemplateOutlet="
+          mostrarSubcarpetas;
+          context: { carpetas: subcarpeta.subcarpetas }
+        "
+      ></ng-container>
     </ul>
   </li>
 </ng-template>
