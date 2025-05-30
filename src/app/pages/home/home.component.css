@@ -2,12 +2,12 @@
 .home-container {
   font-family: 'Arial', sans-serif;
   background: #ffffff;
-  min-height: 100vh;
+  min-height: 70vh;
   width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding: 0 10%;
+  padding: 0 5%;
   overflow: hidden;
 }
 
@@ -95,6 +95,7 @@
   width: 100%;
   max-width: 1200px;
   padding-top: 100px;
+  flex-wrap: wrap;
 }
 
 /* ✅ Texto principal */
@@ -172,6 +173,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 30px;
 }
 
 .hero-image img {
@@ -189,8 +191,8 @@
 }
 
 .social-icons img {
-  width: 35px;
-  height: 35px;
+  width: 55px;
+  height: 55px;
   cursor: pointer;
   transition: 0.3s;
 }
@@ -253,11 +255,54 @@ button:hover {
 }
 
 @media (max-width: 480px) {
+  .hero {
+    flex-direction: column;
+    align-items: center;
+    padding-top: 60px;
+  }
+
+  .hero-text {
+    max-width: 100%;
+    text-align: center;
+  }
+
   .hero-text h1 {
-    font-size: 2rem;
+    font-size: 1.8rem;
+    flex-direction: column;
+  }
+
+  .hero-text p {
+    font-size: 1rem;
+    padding: 0 10px;
+  }
+
+  .buttons {
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .btn-primary,
+  .btn-download {
+    width: 90%;
+    font-size: 0.95rem;
+    padding: 12px 0;
   }
 
   .hero-image {
-    max-width: 80%;
+    max-width: 90%;
+    margin-top: 20px;
+  }
+
+  .social-icons {
+    justify-content: center;
+    flex-wrap: wrap;
+    padding-bottom: 30px;
+  }
+
+  .social-icons img {
+    width: 45px;
+    height: 45px;
   }
 }
+

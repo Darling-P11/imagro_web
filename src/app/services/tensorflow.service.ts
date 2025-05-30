@@ -220,13 +220,13 @@ export class TensorflowService {
 
   // PROBAR MODELO
   async cargarModeloGuardado() {
-    console.log("📥 Cargando modelo guardado...");
+    console.log(" Cargando modelo guardado...");
     try {
         const model = await tf.loadLayersModel('/assets/mobilenetv1_model.json'); // Ruta en tu proyecto
         console.log("✅ Modelo cargado correctamente.");
         return model;
     } catch (error) {
-        console.error("❌ Error al cargar el modelo:", error);
+        console.error(" Error al cargar el modelo:", error);
         return null;
     }
   }
@@ -404,6 +404,9 @@ private async generarMatrizConfusion(): Promise<string> {
       }, 500);
   });
 }
+    
+
+
 
 
 

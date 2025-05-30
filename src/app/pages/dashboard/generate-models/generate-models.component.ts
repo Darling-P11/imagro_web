@@ -247,4 +247,4 @@ export class GenerarModeloComponent implements OnInit {
     this.tensorflowService.generarReporteEntrenamiento();
   }
 
-}
+} 

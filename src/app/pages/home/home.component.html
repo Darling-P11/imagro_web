@@ -1,6 +1,6 @@
 <div class="home-container">
   <!-- Navbar -->
-  <nav class="navbar">
+  <!--<nav class="navbar">
     <div class="logo">
       <img src="assets/images/logo_banner.png" alt="Imagro Logo">
     </div>
@@ -13,7 +13,7 @@
       </ul>
       <button class="btn-signin" (click)="goToLogin()">Ingresar</button>
     </div>
-  </nav>
+  </nav>-->
 
   <!-- Sección principal -->
   <section class="hero">
@@ -23,26 +23,32 @@
         <span class="highlight-blue">para el aprendizaje</span>
       </h1>
       <p>
-        Plataforma educativa que ayuda a los estudiantes a analizar datasets de cultivos agrícolas mediante georreferencias. 
-        Permite explorar, clasificar y entrenar modelos de IA con imágenes reales, fortaleciendo el aprendizaje práctico 
-        y el desarrollo del pensamiento crítico en la investigación agrícola.
+        Sistema educativo que ayuda a los estudiantes a analizar datasets de
+        cultivos agrícolas georreferenciados. Permite explorar, descargar y
+        entrenar modelos de reconocimiento de imagenes con imágenes reales,
+        fortaleciendo el aprendizaje práctico y el desarrollo del pensamiento
+        crítico en la investigación agrícola.
       </p>
 
       <div class="buttons">
-        <button class="btn-primary" (click)="goToLogin()">Comenzar</button>
-        <button class="btn-download">Descarga la App</button>
+        <button class="btn-primary" (click)="goToLogin()">Ingresar</button>
+        <button
+          class="btn-download"
+          onclick="window.open('https://play.google.com/store/apps/details?id=com.UTEQ.imagro&pcampaignid=web_share', '_blank')"
+        >
+          Descarga la App
+        </button>
       </div>
 
       <div class="social-icons">
-        <img src="assets/icons/instagram.png" alt="Instagram">
-        <img src="assets/icons/twitter.png" alt="Twitter">
-        <img src="assets/icons/tiktok.png" alt="Tiktok">
-        <img src="assets/icons/facebook.png" alt="Facebook">
+        <img src="assets/icons/logo_uteq.jpg" alt="Instagram" />
+        <img src="assets/icons/fccdd.png" alt="Twitter" />
+        <img src="assets/icons/logo_software.png" alt="Tiktok" />
       </div>
     </div>
 
     <div class="hero-image">
-      <img src="assets/images/CENTER.png" alt="Illustration">
+      <img src="assets/images/CENTER.png" alt="Illustration" />
     </div>
   </section>
 </div>
