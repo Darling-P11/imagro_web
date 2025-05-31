@@ -1,68 +1,169 @@
-<div class="tag-management-container">
-  <div class="tag-management-card">
-    <h2>Registrar nuevo cultivo</h2>
+<div class="tag-layout">
+  <!-- Columna izquierda: Formulario -->
+  <div class="tag-column left">
+    <div class="tag-card-fixed">
+      <h2>Registrar nuevo cultivo</h2>
 
-    <form (ngSubmit)="guardarConfiguracion()">
-      <!-- Cultivo -->
-      <div class="form-group">
-        <label for="cultivo">Cultivo:</label>
-        <input id="cultivo" type="text" [(ngModel)]="cultivoSeleccionado" name="cultivo" placeholder="Ingrese el nombre del cultivo">
-      </div>
-
-      <!-- Tipos de Cultivo -->
-      <div class="form-group">
-        <label for="tipo">Tipos de Cultivo:</label>
-        <div class="input-group">
-          <input id="tipo" type="text" [(ngModel)]="tipoTemporal" name="tipo" placeholder="Ingrese un tipo de cultivo">
-          <button type="button" class="btn-add" (click)="agregarTipo()">+</button>
+      <form (ngSubmit)="abrirModal()" class="form-scroll">
+        <!-- Cultivo -->
+        <div class="form-group">
+          <label for="cultivo">Cultivo:</label>
+          <input
+            id="cultivo"
+            type="text"
+            [(ngModel)]="cultivoSeleccionado"
+            name="cultivo"
+            placeholder="Ingrese el nombre del cultivo"
+          />
         </div>
-        <ul class="chip-list">
-          <li *ngFor="let tipo of tiposCultivo" class="chip">
-            {{ tipo }} <button type="button" class="btn-delete" (click)="eliminarTipo(tipo)">❌</button>
-          </li>
-        </ul>
-      </div>
 
-      <!-- Estado -->
-      <div class="form-group">
-        <label for="estado">Estado:</label>
-        <select id="estado" [(ngModel)]="estadoSeleccionado" name="estado" (change)="verificarEstado()">
-          <option *ngFor="let estado of estados" [value]="estado">{{ estado }}</option>
-        </select>
-      </div>
-
-      <!-- Enfermedades -->
-      <div class="form-group" *ngIf="estadoSeleccionado === 'Enfermo'">
-        <label for="enfermedad">Enfermedades:</label>
-        <div class="input-group">
-          <input id="enfermedad" type="text" [(ngModel)]="enfermedadTemporal" name="enfermedad" placeholder="Ingrese una enfermedad">
-          <button type="button" class="btn-add" (click)="agregarEnfermedad()">+</button>
+        <!-- Tipos de Cultivo -->
+        <div class="form-group">
+          <label for="tipo">Tipos de Cultivo:</label>
+          <div class="input-group">
+            <input
+              id="tipo"
+              type="text"
+              [(ngModel)]="tipoTemporal"
+              name="tipo"
+              placeholder="Ingrese un tipo de cultivo"
+            />
+            <button type="button" class="btn-add" (click)="agregarTipo()">
+              +
+            </button>
+          </div>
+          <ul class="chip-list">
+            <li *ngFor="let tipo of tiposCultivo" class="chip">
+              {{ tipo }}
+              <button
+                type="button"
+                class="btn-delete"
+                (click)="eliminarTipo(tipo)"
+              >
+                <i class="ri-close-line"></i>
+              </button>
+            </li>
+          </ul>
         </div>
-        <ul class="chip-list">
-          <li *ngFor="let enfermedad of enfermedadesSeleccionadas" class="chip">
-            {{ enfermedad }} <button type="button" class="btn-delete" (click)="eliminarEnfermedad(enfermedad)">❌</button>
-          </li>
-        </ul>
-      </div>
 
-      <!-- Feedback de carga -->
-      <div *ngIf="cargando" class="loading-spinner">
+        <!-- Estado -->
+        <div class="form-group">
+          <label for="estado">Estado:</label>
+          <select
+            id="estado"
+            [(ngModel)]="estadoSeleccionado"
+            name="estado"
+            (change)="verificarEstado()"
+          >
+            <option *ngFor="let estado of estados" [value]="estado">
+              {{ estado }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Enfermedades -->
+        <div class="form-group" *ngIf="estadoSeleccionado === 'Enfermo'">
+          <label for="enfermedad">Enfermedades:</label>
+          <div class="input-group">
+            <input
+              id="enfermedad"
+              type="text"
+              [(ngModel)]="enfermedadTemporal"
+              name="enfermedad"
+              placeholder="Ingrese una enfermedad"
+            />
+            <button type="button" class="btn-add" (click)="agregarEnfermedad()">
+              +
+            </button>
+          </div>
+          <ul class="chip-list">
+            <li
+              *ngFor="let enfermedad of enfermedadesSeleccionadas"
+              class="chip"
+            >
+              {{ enfermedad }}
+              <button
+                type="button"
+                class="btn-delete"
+                (click)="eliminarEnfermedad(enfermedad)"
+              >
+                <i class="ri-close-line"></i>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Feedback de carga -->
+        <div *ngIf="cargando" class="loading-spinner">
+          <div class="spinner"></div>
+          <p>Guardando información...</p>
+        </div>
+
+        <!-- Mensaje de éxito -->
+        <div *ngIf="mensajeExito" class="success-message">
+          ✅ {{ mensajeExito }}
+        </div>
+
+        <!-- 🔹 Botón Guardar -->
+        <div class="form-group">
+          <button
+            type="submit"
+            [disabled]="
+              cargando ||
+              !cultivoSeleccionado ||
+              tiposCultivo.length === 0 ||
+              !estadoSeleccionado
+            "
+            class="btn-save"
+          >
+            Guardar Configuración
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Columna derecha: Cultivos registrados con scroll interno -->
+  <div class="tag-column right">
+    <div class="tag-card-fixed">
+      <h2 class="section-title">Cultivos Registrados</h2>
+
+      <div *ngIf="cargandoListado" class="loading-spinner">
         <div class="spinner"></div>
-        <p>Guardando información...</p>
+        <p>Cargando cultivos...</p>
       </div>
 
-      <!-- Mensaje de éxito -->
-      <div *ngIf="mensajeExito" class="success-message">
-        ✅ {{ mensajeExito }}
+      <div class="scrollable-cultivos">
+        <!-- ⬇ Tarjetas de cultivo -->
+        <div *ngFor="let cultivo of cultivos" class="cultivo-card">
+          <div class="cultivo-info">
+            <h4>{{ cultivo.nombre }}</h4>
+            <p><strong>Estado:</strong> {{ cultivo.estado }}</p>
+            <p><strong>Tipos:</strong> {{ cultivo.tipos.join(", ") }}</p>
+            <p>
+              <strong>Enfermedades:</strong>
+              {{ cultivo.enfermedades?.join(", ") || "Ninguna" }}
+            </p>
+          </div>
+          <div class="cultivo-actions">
+            <button
+              class="btn-icon edit"
+              (click)="editarCultivo(cultivo)"
+              title="Editar"
+            >
+              <i class="ri-edit-2-line"></i>
+            </button>
+            <button
+              class="btn-icon delete"
+              (click)="eliminarCultivo(cultivo)"
+              title="Eliminar"
+            >
+              <i class="ri-delete-bin-6-line"></i>
+            </button>
+          </div>
+        </div>
       </div>
-
-      <!-- 🔹 Botón Guardar -->
-      <div class="form-group">
-        <button type="submit" [disabled]="cargando || !cultivoSeleccionado || tiposCultivo.length === 0 || !estadoSeleccionado" class="btn-save">
-          Guardar Configuración
-        </button>
-      </div>
-    </form>
+    </div>
   </div>
 </div>
 
@@ -72,9 +173,10 @@
     <h3>¿Confirmar registro?</h3>
     <p>¿Deseas guardar esta configuración de cultivo?</p>
     <div class="modal-buttons">
-      <button class="btn-confirm" (click)="confirmarGuardado()">Sí, guardar</button>
+      <button class="btn-confirm" (click)="confirmarGuardado()">
+        Sí, guardar
+      </button>
       <button class="btn-cancel" (click)="cancelarGuardado()">Cancelar</button>
     </div>
   </div>
 </div>
-

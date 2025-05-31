@@ -10,11 +10,13 @@
 .tag-management-container {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: #ffffff;
-  position: relative;
+  align-items: flex-start;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f8f9fb; /* mismo fondo claro para todo */
+  padding: 2rem 1rem;
 }
+
 
 /* 🔹 Tarjeta de Configuración */
 .tag-management-card {
@@ -282,3 +284,254 @@ input:focus, select:focus {
 .btn-cancel:hover {
   background: #aaa;
 }
+.cultivo-cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* 🔹 Tarjeta del cultivo */
+.cultivo-card {
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.cultivo-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* 🔹 Info del cultivo */
+.cultivo-info h4 {
+  color: #0ba27f;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.cultivo-info p {
+  margin: 4px 0;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+/* 🔹 Botones */
+.cultivo-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn-icon {
+  background: #0ba27f;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.btn-icon.edit:hover {
+  background: #088a66;
+  transform: scale(1.1);
+}
+
+.btn-icon.delete {
+  background: red;
+}
+
+.btn-icon.delete:hover {
+  background: darkred;
+  transform: scale(1.1);
+}
+.section-title {
+  text-align: center;
+  font-size: 1.6rem;
+  color: #0ba27f;
+  font-weight: 700;
+  margin: 1rem 0 2rem;
+}
+
+.section-divider {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, #0ba27f, transparent);
+  border: none;
+  margin: 2rem 0 0.5rem;
+}
+.cultivo-cards-container {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+.cultivo-card {
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  transition: 0.3s;
+}
+
+/* 🔹 Layout general en dos columnas */
+.tag-layout {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  gap: 2rem;
+  background: #f8f9fb;
+}
+
+/* 🔹 Columnas con tamaño fijo y consistente */
+.tag-column {
+  flex: none;
+  width: 500px;
+}
+
+/* 🔹 Separador vertical */
+.tag-divider {
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, #ccc, transparent);
+}
+
+/* 🔹 Contenedor con scroll para cultivos */
+.tag-scroll-card {
+  background: #fff;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.08);
+  height: 600px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.scrollable {
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  flex-grow: 1;
+}
+
+/* 🔹 Ajuste visual de sección */
+.section-title {
+  text-align: center;
+  font-size: 1.5rem;
+  color: #0ba27f;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+/* Layout general */
+.tag-layout {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem;
+  gap: 2rem;
+  height: 100vh; /* 🔹 Altura total sin scroll vertical de body */
+  overflow: hidden;
+  background: #f8f9fb;
+}
+
+/* Columnas */
+.tag-column {
+  width: 500px;
+  flex-shrink: 0;
+}
+
+/* 🔹 Contenedor del formulario y del scroll con altura fija */
+.tag-card-fixed {
+  background: #fff;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.08);
+  height: calc(100vh - 4rem); /* altura exacta con padding compensado */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 🔹 Scroll interno en sección de cultivos */
+.scrollable-cultivos {
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  flex-grow: 1;
+}
+
+/* Línea divisoria visible */
+.tag-divider {
+  width: 1px;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, #ccc, transparent);
+  margin: 0 10px;
+}
+.chip {
+  background: #0ba27f;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 15px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 5px;
+}
+
+.btn-delete {
+  background: white;
+  color: #d32f2f;
+  border: none;
+  width: 22px;
+  height: 22px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.3s ease;
+}
+
+.btn-delete:hover {
+  background: #ffdada;
+  transform: scale(1.2);
+}
+
+/* Columna izquierda (formulario) */
+.tag-column.left {
+  display: flex;
+  justify-content: center;
+}
+
+/* Columna derecha (lista) */
+.tag-column.right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.tag-card-fixed {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 4rem);
+  overflow: hidden;
+}
+
+.form-scroll {
+  overflow-y: auto;
+  flex-grow: 1;
+  padding-right: 0.5rem;
+}
+
