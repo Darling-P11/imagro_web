@@ -3,25 +3,42 @@
   <div class="sidebar-container">
     <h3><i class="ri-folder-line"></i> Selecciona los cultivos</h3>
 
-    <!-- 🔹 Loading mientras carga la estructura -->
+    <!--  Loading mientras carga la estructura -->
     <div *ngIf="cargandoCarpetas" class="loading-container">
-      <i class="ri-loader-4-line ri-spin"></i> Cargando carpetas...
+      <div class="spinner"></div>
+      <p>Cargando carpetas...</p>
     </div>
 
-    <!-- 🔹 Árbol de selección (se oculta mientras se cargan las carpetas) -->
+    <!--  Árbol de selección (se oculta mientras se cargan las carpetas) -->
+
     <ul *ngIf="!cargandoCarpetas" class="tree-list">
       <li *ngFor="let carpeta of elementosDescarga">
         <label (click)="toggleExpandir(carpeta, $event)">
-          <input type="checkbox" [(ngModel)]="carpeta.seleccionado" (change)="toggleSeleccion(carpeta, $event)" />
+          <input
+            type="checkbox"
+            [(ngModel)]="carpeta.seleccionado"
+            (change)="toggleSeleccion(carpeta, $event)"
+          />
           <span>
-            <i *ngIf="carpeta.subelementos && !carpeta.abierto" class="ri-folder-line"></i>
-            <i *ngIf="carpeta.subelementos && carpeta.abierto" class="ri-folder-open-line"></i>
+            <i
+              *ngIf="carpeta.subelementos && !carpeta.abierto"
+              class="ri-folder-line"
+            ></i>
+            <i
+              *ngIf="carpeta.subelementos && carpeta.abierto"
+              class="ri-folder-open-line"
+            ></i>
             {{ carpeta.nombre }}
           </span>
         </label>
 
         <ul *ngIf="carpeta.abierto">
-          <ng-container *ngTemplateOutlet="mostrarSubcarpetas; context: { carpetas: carpeta.subelementos }"></ng-container>
+          <ng-container
+            *ngTemplateOutlet="
+              mostrarSubcarpetas;
+              context: { carpetas: carpeta.subelementos }
+            "
+          ></ng-container>
         </ul>
       </li>
     </ul>
@@ -34,15 +51,18 @@
 
     <!-- 🔹 Mensaje de Advertencia si no hay mínimo 2 clases seleccionadas -->
     <div *ngIf="!tieneMinimoDosClases()" class="warning-message">
-      <i class="ri-alert-line"></i> Debes seleccionar al menos 2 clases para entrenar el modelo.
+      <i class="ri-alert-line"></i> Debes seleccionar al menos 2 clases para
+      entrenar el modelo.
     </div>
 
     <!-- 🔹 Botón de Entrenamiento con indicador de carga -->
-    <button class="btn-train" (click)="iniciarEntrenamiento()" 
-      [disabled]="!tieneSeleccionadas() || cargandoModelo || !tieneMinimoDosClases()">
-      <i class="ri-brain-line"></i>
-      {{ cargandoModelo ? "Entrenando..." : "Entrenar Modelo" }}
-    </button>
+    <button class="btn-train"
+  (click)="prepararResumenEntrenamiento()"
+  [disabled]="!tieneSeleccionadas() || cargandoModelo || !tieneMinimoDosClases()">
+  <i class="ri-brain-line"></i>
+  {{ cargandoModelo ? "Entrenando..." : "Entrenar Modelo" }}
+</button>
+
 
     <!-- 🔹 Barra de Progreso Animada -->
     <div *ngIf="cargandoModelo" class="progress-container">
@@ -52,8 +72,9 @@
 
     <!-- 🔹 Mensaje de carga mientras se entrena -->
     <p *ngIf="cargandoModelo" class="training-message">
-      <i class="ri-time-line"></i> El modelo está entrenando. Esto puede tardar unos minutos...
-    </p>
+  <i class="ri-time-line"></i> {{ obtenerFaseEntrenamiento(progresoEntrenamiento) }}
+</p>
+
 
     <!-- 🔹 Animación de Éxito cuando el modelo está listo -->
     <div *ngIf="modeloEntrenado" class="success-message">
@@ -61,15 +82,22 @@
     </div>
 
     <!-- 🔹 Botón de descarga del modelo una vez entrenado -->
-    <button *ngIf="modeloEntrenado" class="btn-download animated-bounce" (click)="descargarModelo()">
+    <button
+      *ngIf="modeloEntrenado"
+      class="btn-download animated-bounce"
+      (click)="descargarModelo()"
+    >
       <i class="ri-download-line"></i> Descargar Modelo (JSON)
     </button>
 
     <!-- 🔹 Botón para Descargar el PDF -->
-<button *ngIf="modeloEntrenado" class="btn-pdf" (click)="descargarReporteEntrenamiento()">
-  <i class="ri-file-pdf-line"></i> Descargar Reporte PDF
-</button>
-
+    <button
+      *ngIf="modeloEntrenado"
+      class="btn-pdf"
+      (click)="descargarReporteEntrenamiento()"
+    >
+      <i class="ri-file-pdf-line"></i> Descargar Reporte PDF
+    </button>
   </div>
 </div>
 
@@ -77,16 +105,31 @@
 <ng-template #mostrarSubcarpetas let-carpetas="carpetas">
   <li *ngFor="let subcarpeta of carpetas">
     <label (click)="toggleExpandir(subcarpeta, $event)">
-      <input type="checkbox" [(ngModel)]="subcarpeta.seleccionado" (change)="toggleSeleccion(subcarpeta, $event)" />
+      <input
+        type="checkbox"
+        [(ngModel)]="subcarpeta.seleccionado"
+        (change)="toggleSeleccion(subcarpeta, $event)"
+      />
       <span>
-        <i *ngIf="subcarpeta.subelementos && !subcarpeta.abierto" class="ri-folder-line"></i>
-        <i *ngIf="subcarpeta.subelementos && subcarpeta.abierto" class="ri-folder-open-line"></i>
+        <i
+          *ngIf="subcarpeta.subelementos && !subcarpeta.abierto"
+          class="ri-folder-line"
+        ></i>
+        <i
+          *ngIf="subcarpeta.subelementos && subcarpeta.abierto"
+          class="ri-folder-open-line"
+        ></i>
         {{ subcarpeta.nombre }}
       </span>
     </label>
 
     <ul *ngIf="subcarpeta.abierto">
-      <ng-container *ngTemplateOutlet="mostrarSubcarpetas; context: { carpetas: subcarpeta.subelementos }"></ng-container>
+      <ng-container
+        *ngTemplateOutlet="
+          mostrarSubcarpetas;
+          context: { carpetas: subcarpeta.subelementos }
+        "
+      ></ng-container>
     </ul>
   </li>
 </ng-template>
@@ -94,4 +137,50 @@
 <!-- 🔹 Notificación flotante cuando el modelo está listo -->
 <div *ngIf="notificacion" class="toast-message">
   {{ notificacion }}
+</div>
+
+<!--modal de resumen de modelo pre entrenado-->
+<div *ngIf="mostrarResumenModal" class="modal-overlay">
+  <div class="modal-content">
+    <h2><i class="ri-information-line"></i> Resumen de Entrenamiento</h2>
+    
+    <p><strong>Clases:</strong> {{ resumenEntrenamiento.clases.join(', ') }}</p>
+    
+    <ul>
+      <li *ngFor="let clase of resumenEntrenamiento.clases">
+        {{ clase }}: {{ resumenEntrenamiento.resumen[clase] }} imágenes
+      </li>
+    </ul>
+
+    <p><strong>Total de imágenes:</strong> {{ resumenEntrenamiento.total }}</p>
+    <p><strong>Duración estimada:</strong> {{ resumenEntrenamiento.duracion }}</p>
+
+    <h3>Configuración</h3>
+    <ul>
+      <li>Epochs: {{ resumenEntrenamiento.epochs }}</li>
+      <li>Batch size: {{ resumenEntrenamiento.batch }}</li>
+      <li>Validación: {{ resumenEntrenamiento.validation }}</li>
+    </ul>
+
+    <div class="modal-actions">
+      <button class="btn-train" (click)="confirmarEntrenamiento()">Confirmar y Entrenar</button>
+      <button class="btn-cancel" (click)="mostrarResumenModal = false">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de carga PDF -->
+<div class="overlay-loading" *ngIf="descargandoPDF">
+  <div class="loading-box">
+    <i class="ri-loader-4-line ri-spin"></i>
+    <p>Generando reporte PDF...</p>
+  </div>
+</div>
+
+<!-- Modal de carga Modelo -->
+<div class="overlay-loading" *ngIf="descargandoModelo">
+  <div class="loading-box">
+    <i class="ri-loader-4-line ri-spin"></i>
+    <p>Guardando modelo entrenado...</p>
+  </div>
 </div>

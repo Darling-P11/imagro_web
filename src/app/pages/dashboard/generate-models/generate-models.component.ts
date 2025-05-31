@@ -27,6 +27,11 @@ export class GenerarModeloComponent implements OnInit {
   progresoEntrenamiento: number = 0; // ✅ Inicializa en 0%
   cargandoCarpetas: boolean = true;
   notificacion: string | null = null; 
+  resumenEntrenamiento: any = null;
+  mostrarResumenModal: boolean = false;
+  descargandoPDF: boolean = false;
+  descargandoModelo: boolean = false;
+
   
 
   constructor(private tensorflowService: TensorflowService) {}
@@ -103,7 +108,7 @@ export class GenerarModeloComponent implements OnInit {
   
   toggleSeleccion(elemento: ElementoDescarga, event: Event) {
     event.stopPropagation();
-    elemento.seleccionado = !elemento.seleccionado;
+    //elemento.seleccionado = !elemento.seleccionado;
   
     if (elemento.subelementos) {
       elemento.subelementos.forEach(sub => this.actualizarEstadoSubelementos(sub, elemento.seleccionado));
@@ -215,17 +220,34 @@ export class GenerarModeloComponent implements OnInit {
               clearInterval(intervaloProgreso);
           });
   }
-    descargarModelo() {
-      if (this.modeloEntrenado) {
-        this.tensorflowService.guardarModelo(this.modeloEntrenado);
-      } else {
-        console.error("❌ No hay un modelo entrenado para descargar.");
+    async descargarModelo() {
+      if (!this.modeloEntrenado) {
+        console.error("❌ No hay modelo entrenado para guardar.");
+        return;
       }
+
+      this.descargandoModelo = true;
+      try {
+        await this.tensorflowService.guardarModelo(this.modeloEntrenado);
+      } catch (error) {
+        console.error("❌ Error guardando el modelo:", error);
+      }
+      this.descargandoModelo = false;
     }
-    mostrarNotificacion(mensaje: string) {
-      this.notificacion = mensaje;
-      setTimeout(() => this.notificacion = "", 3000);
+
+
+    //ALERTA DE NOTIFICACIONES
+      mostrarNotificacion(mensaje: string, tipo: 'success' | 'error' | 'warning' = 'success') {
+    this.notificacion = mensaje;
+    const toast = document.querySelector('.toast-message') as HTMLElement;
+    if (toast) {
+      toast.style.background = tipo === 'error' ? '#dc3545' : tipo === 'warning' ? '#ffc107' : '#0ba27f';
     }
+    setTimeout(() => this.notificacion = "", 4000);
+  }
+
+
+
     tieneMinimoDosClases(): boolean {
       const seleccionadas = this.obtenerSeleccionados(this.elementosDescarga);
       const categoriasUnicas = new Set(seleccionadas.map(ruta => {
@@ -243,8 +265,57 @@ export class GenerarModeloComponent implements OnInit {
   }
 
   //funcion al boton de generar pdf
-  descargarReporteEntrenamiento() {
-    this.tensorflowService.generarReporteEntrenamiento();
+  async descargarReporteEntrenamiento() {
+  this.descargandoPDF = true;
+  try {
+    await this.tensorflowService.generarReporteEntrenamiento();
+  } catch (error) {
+    console.error("❌ Error generando PDF:", error);
   }
+  this.descargandoPDF = false;
+}
+
+
+  //MODAL CON RESUMEN TE LA PRE CONFIGURACION
+  async prepararResumenEntrenamiento() {
+  const imagenesSeleccionadas = this.obtenerSeleccionados(this.elementosDescarga);
+  const resumen: Record<string, number> = {};
+
+  imagenesSeleccionadas.forEach(ruta => {
+    const partes = ruta.split('/');
+    const clase = partes[partes.length - 2];
+    resumen[clase] = (resumen[clase] || 0) + 1;
+  });
+
+  const clases = Object.keys(resumen);
+  const totalImagenes = imagenesSeleccionadas.length;
+
+  this.resumenEntrenamiento = {
+    clases,
+    resumen,
+    total: totalImagenes,
+    duracion: clases.length >= 4 ? '3-5 min' : '2-3 min',
+    epochs: 10,
+    batch: 16,
+    validation: '20%'
+  };
+
+  this.mostrarResumenModal = true;
+}
+  
+confirmarEntrenamiento() {
+  this.mostrarResumenModal = false;
+  this.iniciarEntrenamiento(); // Ya lo tienes implementado
+}
+
+obtenerFaseEntrenamiento(progreso: number): string {
+  if (progreso <= 10) return "Cargando modelo base...";
+  if (progreso <= 20) return "Cargando imágenes...";
+  if (progreso <= 30) return "Preprocesando imágenes...";
+  if (progreso < 100) return "Entrenando modelo...";
+  return "Entrenamiento completado.";
+}
+
+
 
 } 
