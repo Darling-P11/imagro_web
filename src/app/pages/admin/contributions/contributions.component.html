@@ -19,50 +19,77 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let contribution of contributions" (click)="selectContribution(contribution)">
-        <td>{{ contribution.nombreUsuario }}</td> <!-- ✅ Nombre del usuario -->
-        <td>{{ contribution.contributionDetails.fecha_contribucion | date: 'short' }}</td> <!-- ✅ Fecha formateada -->
-        <td>{{ contribution.configuracionCompleta.cultivos.length }}</td> <!-- ✅ Cantidad de cultivos -->
-        <td>{{ contribution.configuracionCompleta.estado }}</td> <!-- ✅ Estado -->
-        <td>{{ contribution.contributionDetails.cantidad_imagenes }}</td> <!-- ✅ Cantidad de imágenes -->
+      <tr
+        *ngFor="let contribution of contributions"
+        (click)="selectContribution(contribution)"
+      >
+        <td>{{ contribution.nombreUsuario }}</td>
+        <!--  Nombre del usuario -->
         <td>
-          <!-- ✅ Botón para ver configuración específica -->
+          {{
+            contribution.contributionDetails.fecha_contribucion | date : "short"
+          }}
+        </td>
+        <!--  Fecha formateada -->
+        <td>{{ contribution.configuracionCompleta.cultivos.length }}</td>
+        <!--  Cantidad de cultivos -->
+        <td>{{ contribution.configuracionCompleta.estado }}</td>
+        <!--  Estado -->
+        <td>{{ contribution.contributionDetails.cantidad_imagenes }}</td>
+        <!--  Cantidad de imágenes -->
+        <td>
+          <!-- Botón para ver configuración específica -->
           <button class="config-btn" (click)="viewConfiguration(contribution)">
             Ver Configuración
           </button>
         </td>
         <td>
+          <!-- Botón Aceptar con flujo de confirmación -->
           <button
-  class="action-button accept"
-  [disabled]="rejectingContributionId === contribution.id"
-  (click)="updateStatus(contribution, 'aceptado')"
->
-  <ng-container *ngIf="rejectingContributionId === contribution.id && currentAction === 'aceptado'; else normalAccept">
-    <div class="button-spinner"></div> Aceptando...
-  </ng-container>
-  <ng-template #normalAccept>Aceptar</ng-template>
-</button>
+            class="action-button accept"
+            [disabled]="rejectingContributionId === contribution.id"
+            (click)="openAcceptConfirm(contribution)"
+          >
+            <ng-container
+              *ngIf="
+                rejectingContributionId === contribution.id &&
+                  currentAction === 'aceptado';
+                else normalAccept
+              "
+            >
+              <div class="button-spinner"></div>
+              Aceptando...
+            </ng-container>
+            <ng-template #normalAccept>Aceptar</ng-template>
+          </button>
 
-<button
-  class="action-button reject"
-  [disabled]="rejectingContributionId === contribution.id"
-  (click)="updateStatus(contribution, 'rechazado')"
->
-  <ng-container *ngIf="rejectingContributionId === contribution.id && currentAction === 'rechazado'; else normalReject">
-    <div class="button-spinner"></div> Rechazando...
-  </ng-container>
-  <ng-template #normalReject>Rechazar</ng-template>
-</button>
+          <!-- Botón Rechazar con confirmación -->
+          <button
+            class="action-button reject"
+            [disabled]="rejectingContributionId === contribution.id"
+            (click)="openRejectConfirm(contribution)"
+          >
+            <ng-container
+              *ngIf="
+                rejectingContributionId === contribution.id &&
+                  currentAction === 'rechazado';
+                else normalReject
+              "
+            >
+              <div class="button-spinner"></div>
+              Rechazando...
+            </ng-container>
+            <ng-template #normalReject>Rechazar</ng-template>
+          </button>
 
-
-<button
-class="action-button view"
-[disabled]="rejectingContributionId !== null"
-(click)="viewContribution(contribution)"
->
-Visualizar
-</button>
-
+          <!-- Botón Visualizar -->
+          <button
+            class="action-button view"
+            [disabled]="rejectingContributionId !== null"
+            (click)="viewContribution(contribution)"
+          >
+            Visualizar
+          </button>
         </td>
       </tr>
     </tbody>
@@ -70,17 +97,28 @@ Visualizar
 </div>
 
 <!--  Modal de Configuración -->
+
 <div *ngIf="showModal" class="modal-overlay">
   <div class="modal-content">
-    <h2>📋 Resumen de tu configuración</h2> <!-- ✅ Título fijo -->
+    <h2>📋 Resumen de tu configuración</h2>
+    <!--  Título fijo -->
     <div *ngIf="selectedConfigData">
-      <div *ngFor="let cultivo of getCultivos(selectedConfigData)" class="cultivo-container">
+      <div
+        *ngFor="let cultivo of getCultivos(selectedConfigData)"
+        class="cultivo-container"
+      >
         <h3 class="cultivo-title">Cultivo: {{ cultivo }}</h3>
         <div *ngFor="let tipo of getTiposCultivo(selectedConfigData[cultivo])">
           <p class="tipo-cultivo">🏷️ {{ tipo }}</p>
-          <p class="estado">Estado: {{ selectedConfigData[cultivo][tipo].estado }}</p>
-          <p class="enfermedades">Enfermedades: 
-            {{ selectedConfigData[cultivo][tipo].enfermedades?.join(', ') || 'Sin enfermedades' }}
+          <p class="estado">
+            Estado: {{ selectedConfigData[cultivo][tipo].estado }}
+          </p>
+          <p class="enfermedades">
+            Enfermedades:
+            {{
+              selectedConfigData[cultivo][tipo].enfermedades?.join(", ") ||
+                "Sin enfermedades"
+            }}
           </p>
         </div>
       </div>
@@ -89,35 +127,67 @@ Visualizar
   </div>
 </div>
 
-<!-- ✅ Modal de Visualización de Imágenes -->
+<!--  Modal de Visualización de Imágenes -->
 
 <div *ngIf="isVisualizeModalVisible" class="modal-overlay">
   <div class="modal-content-large">
-    <!-- ✅ Botón de cerrar -->
+    <!--  Botón de cerrar -->
     <button class="close-button" (click)="closeVisualizeModal()">❌</button>
 
-    <!-- ✅ Título centrado -->
+    <!--  Título centrado -->
     <h2>🖼️ Visualización de Imágenes</h2>
 
-    <!-- ✅ Secciones organizadas -->
-    <div *ngFor="let cultivo of getCultivosFromImages()" class="cultivo-section">
+    <!--  Secciones organizadas -->
+    <div
+      *ngFor="let cultivo of getCultivosFromImages()"
+      class="cultivo-section"
+    >
       <h3>{{ cultivo }}</h3>
 
-      <div *ngFor="let tipo of getTiposFromImages(cultivo)" class="tipo-section">
+      <div
+        *ngFor="let tipo of getTiposFromImages(cultivo)"
+        class="tipo-section"
+      >
         <h4>Tipo: {{ tipo }}</h4>
 
-        <div *ngFor="let estado of getEstadosFromImages(cultivo, tipo)" class="estado-section">
+        <div
+          *ngFor="let estado of getEstadosFromImages(cultivo, tipo)"
+          class="estado-section"
+        >
           <h5>Estado: {{ estado }}</h5>
 
-          <div *ngFor="let enfermedad of getEnfermedadesFromImages(cultivo, tipo, estado)" class="enfermedad-section">
+          <div
+            *ngFor="
+              let enfermedad of getEnfermedadesFromImages(cultivo, tipo, estado)
+            "
+            class="enfermedad-section"
+          >
             <h6>Enfermedad: {{ enfermedad }}</h6>
 
             <!-- ✅ Mosaico de imágenes -->
             <div class="image-grid">
-              <img *ngFor="let img of filterImagesByCompleteCriteria(cultivo, tipo, estado, enfermedad)" 
-                   [src]="img.url" 
-                   alt="Imagen de contribución" 
-                   class="image-preview-grid"/>
+              <ng-container
+                *ngFor="
+                  let img of filterImagesByCompleteCriteria(
+                    cultivo,
+                    tipo,
+                    estado,
+                    enfermedad
+                  )
+                "
+              >
+                <div class="image-wrapper">
+                  <img
+                    [src]="img.url"
+                    alt="Imagen de contribución"
+                    class="image-preview-grid"
+                    (load)="onImageLoad(img)"
+                    (error)="onImageError(img)"
+                    [class.loaded]="img.loaded"
+                  />
+                  <div class="mini-spinner" *ngIf="!img.loaded"></div>
+                </div>
+              </ng-container>
             </div>
           </div>
         </div>
@@ -129,5 +199,73 @@ Visualizar
   </div>
 </div>
 
+<!--  Modal de carga mientras se visualizan imágenes -->
+<div *ngIf="isLoadingImages" class="modal-overlay">
+  <div class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Cargando imágenes...</p>
+  </div>
+</div>
 
+<!--  Modal de confirmación para rechazar -->
+<div *ngIf="showRejectConfirmModal" class="modal-overlay">
+  <div class="modal-content">
+    <h2>¿Estás seguro de rechazar esta contribución?</h2>
+    <p>Esta acción moverá las imágenes a la sección de rechazadas.</p>
+    <div
+      style="
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 20px;
+      "
+    >
+      <button class="action-button reject" (click)="confirmReject()">
+        Sí, rechazar
+      </button>
+      <button class="action-button view" (click)="cancelReject()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>
 
+<!--  Modal de carga mientras se procesa el rechazo -->
+<div *ngIf="isProcessingRejection" class="modal-overlay">
+  <div class="loading-spinner">
+    <div class="spinner"></div>
+    <p>{{ currentProcessingText }}</p>
+
+  </div>
+</div>
+
+<!--  Modal mientras se actualiza la tabla tras aceptar o rechazar -->
+<div *ngIf="isUpdatingTable" class="modal-overlay">
+  <div class="loading-spinner">
+    <div class="spinner"></div>
+    <p>Actualizando contribuciones...</p>
+  </div>
+</div>
+
+<!-- ✅ Modal de confirmación para aceptar -->
+<div *ngIf="showAcceptConfirmModal" class="modal-overlay">
+  <div class="modal-content">
+    <h2>¿Aceptar esta contribución?</h2>
+    <p>Esta acción moverá la información a la sección de aprobadas.</p>
+    <div
+      style="
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 20px;
+      "
+    >
+      <button class="action-button accept" (click)="confirmAccept()">
+        Sí, aceptar
+      </button>
+      <button class="action-button view" (click)="cancelAccept()">
+        Cancelar
+      </button>
+    </div>
+  </div>
+</div>

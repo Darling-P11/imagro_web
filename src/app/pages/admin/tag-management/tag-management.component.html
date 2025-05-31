@@ -65,3 +65,16 @@
     </form>
   </div>
 </div>
+
+<!--  Modal de Confirmación -->
+<div class="modal-overlay" *ngIf="mostrarModal">
+  <div class="modal-content">
+    <h3>¿Confirmar registro?</h3>
+    <p>¿Deseas guardar esta configuración de cultivo?</p>
+    <div class="modal-buttons">
+      <button class="btn-confirm" (click)="confirmarGuardado()">Sí, guardar</button>
+      <button class="btn-cancel" (click)="cancelarGuardado()">Cancelar</button>
+    </div>
+  </div>
+</div>
+

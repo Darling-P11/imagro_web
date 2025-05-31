@@ -20,6 +20,8 @@ export class TagManagementComponent {
   enfermedadesSeleccionadas: string[] = [];
   cargando: boolean = false;
   mensajeExito: string = '';
+  mostrarModal: boolean = false;
+  configPendiente: any = null;
 
   constructor(private firestore: Firestore) {}
 
