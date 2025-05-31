@@ -1,8 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Firestore, collection, collectionData, doc, docData } from '@angular/fire/firestore';
 import { Auth, user } from '@angular/fire/auth';
 import { Observable } from 'rxjs';
+import { Firestore, collection as ngCollection, collectionData, doc, docData } from '@angular/fire/firestore'; // AngularFire para inyección
+import { getDocs, collection,  getFirestore } from 'firebase/firestore'; // Firebase SDK modular para lectura manual
+
+
+
+
+
+
+
+
 
 @Component({
   selector: 'app-default',
@@ -25,12 +34,21 @@ export class DefaultComponent implements OnInit {
   totalAcceptedContributions: number = 0;
   totalUsers: number = 0;
   totalModels: number = 0;
+  totalActiveContributors: number = 0;
 
   constructor(private firestore: Firestore, private auth: Auth) {}
 
-  ngOnInit() {
-    this.getUserData();
-  }
+ ngOnInit() {
+  this.getUserData();
+  this.getUsersCount();
+  this.getModelsCount();
+  this.getActiveContributors();
+
+
+  this.getAcceptedContributions(); 
+}
+
+
 
   // 🔹 Obtiene los datos del usuario autenticado desde Firestore
   getUserData() {
@@ -61,45 +79,55 @@ export class DefaultComponent implements OnInit {
 
   // 🔹 Obtiene TODAS las contribuciones y las filtra manualmente comparando `usuario === userId`
   getUserContributions() {
-    const estados = ['enviado', 'aceptado', 'rechazado'];
+  const estados = ['enviado', 'aceptado', 'rechazado'];
 
-    estados.forEach(estado => {
-      const collectionPath = `/historialContribuciones/PRWCxyVh65dsy7mwDFqVMvJF6di1/${estado}`;
-      const collectionRef = collection(this.firestore, collectionPath);
-
-      collectionData(collectionRef).subscribe((data: any[]) => {
-        console.log(`Todas las contribuciones (${estado}):`, data);
-
-        // 🔹 Filtramos correctamente por `usuario === userId`
-        const userContributions = data.filter(contribution => contribution.usuario === this.userId);
-        
-        console.log(`Contribuciones (${estado}) del usuario:`, userContributions);
-
-        switch (estado) {
-          case 'enviado':
-            this.pendingContributions = userContributions.length || 0;
-            break;
-          case 'aceptado':
-            this.approvedContributions = userContributions.length || 0;
-            break;
-          case 'rechazado':
-            this.rejectedContributions = userContributions.length || 0;
-            break;
-        }
-      });
-    });
-  }
-
-  // 🔹 Obtiene las contribuciones aceptadas en general (para "Datos de Imagro")
-  getAcceptedContributions() {
-    const collectionPath = `/historialContribuciones/PRWCxyVh65dsy7mwDFqVMvJF6di1/aceptado`;
+  estados.forEach(estado => {
+    const collectionPath = `/historialContribuciones/${this.userId}/${estado}`; // ← Aquí el cambio importante
     const collectionRef = collection(this.firestore, collectionPath);
 
-    collectionData(collectionRef).subscribe((data) => {
-      console.log("Contribuciones aceptadas globales:", data);
-      this.totalAcceptedContributions = data.length || 0;
+    collectionData(collectionRef).subscribe((data: any[]) => {
+      console.log(`Contribuciones (${estado}) del usuario:`, data);
+
+      switch (estado) {
+        case 'enviado':
+          this.pendingContributions = data.length || 0;
+          break;
+        case 'aceptado':
+          this.approvedContributions = data.length || 0;
+          break;
+        case 'rechazado':
+          this.rejectedContributions = data.length || 0;
+          break;
+      }
     });
+  });
+}
+
+
+  // 🔹 Obtiene las contribuciones aceptadas en general (para "Datos de Imagro")
+    async getAcceptedContributions() {
+  const db = getFirestore(); // ← Solución aquí
+
+  const usersRef = collection(db, 'historialContribuciones'); // ahora sí es válido
+  const usersSnap = await getDocs(usersRef);
+
+  let total = 0;
+
+  for (const doc of usersSnap.docs) {
+    const acceptedRef = collection(db, `historialContribuciones/${doc.id}/aceptado`);
+    const acceptedSnap = await getDocs(acceptedRef);
+    total += acceptedSnap.size;
   }
+
+  this.totalAcceptedContributions = total;
+  console.log("✅ Total global de aceptadas:", total);
+}
+
+
+
+
+
+
 
   // 🔹 Obtiene la cantidad total de usuarios
   getUsersCount() {
@@ -126,4 +154,31 @@ export class DefaultComponent implements OnInit {
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
   }
+
+  async getActiveContributors() {
+  const db = getFirestore(); // 🔁 SDK de Firebase puro
+  const usersRef = collection(db, 'historialContribuciones');
+  const usersSnap = await getDocs(usersRef);
+
+  let total = 0;
+
+  for (const userDoc of usersSnap.docs) {
+    const userId = userDoc.id;
+
+    const enviadoSnap = await getDocs(collection(db, `historialContribuciones/${userId}/enviado`));
+    const aceptadoSnap = await getDocs(collection(db, `historialContribuciones/${userId}/aceptado`));
+    const rechazadoSnap = await getDocs(collection(db, `historialContribuciones/${userId}/rechazado`));
+
+    const totalContribuciones = enviadoSnap.size + aceptadoSnap.size + rechazadoSnap.size;
+
+    if (totalContribuciones > 0) {
+      total++;
+    }
+  }
+
+  this.totalActiveContributors = total;
+  console.log("👥 Usuarios que han contribuido:", total);
+}
+
+
 }
