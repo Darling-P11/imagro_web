@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { Firestore, collection, collectionData, doc, getDoc, getDocs, updateDoc, deleteDoc, setDoc } from '@angular/fire/firestore';
+import { Firestore, collection, collectionData, doc, getDoc, getDocs, updateDoc, deleteDoc, addDoc, setDoc, collection as fsCollection} from '@angular/fire/firestore';
 import { Observable, from } from 'rxjs';
 import { Storage, getStorage, ref, listAll, getDownloadURL, deleteObject, uploadBytes } from '@angular/fire/storage';
+import { nanoid } from 'nanoid';
 
 
 
@@ -363,6 +364,14 @@ private async recursivelyMoveImagesToAccepted(
 
 
   //RECHAZO DE IMAGEN Y RESTRUCTURACION EN FIRESTOREGE
-  
+  async sendNotification(userId: string, titulo: string, mensaje: string): Promise<void> {
+  const notificacionRef = fsCollection(this.firestore, `notificaciones/${userId}/mensajes`);
+  await addDoc(notificacionRef, {
+    titulo,
+    mensaje,
+    fecha: new Date(),
+    estado: 'nuevo',
+  });
+}
   
 }

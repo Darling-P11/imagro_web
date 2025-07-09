@@ -80,6 +80,7 @@ async updateStatus(contribution: any, status: string): Promise<void> {
         contribution.id
       );
     }
+    
 
     //  Recargar la lista de contribuciones
     await this.loadPendingContributions();
@@ -90,6 +91,7 @@ async updateStatus(contribution: any, status: string): Promise<void> {
     this.currentAction = null;
   }
 }
+
 
 
   //  Mostrar configuración en el modal
@@ -175,6 +177,13 @@ async confirmReject(): Promise<void> {
       contribution.id
     );
 
+    await this.contributionService.sendNotification(
+    contribution.usuarioId,
+    'Contribución rechazada',
+    'Tu contribución ha sido revisada y lamentablemente ha sido rechazada. Te invitamos a intentarlo nuevamente.'
+  );
+
+
     //  Esperar brevemente para simular la actualización (opcional)
     this.isUpdatingTable = true;
 
@@ -224,6 +233,12 @@ async confirmAccept(): Promise<void> {
       contributionId,
       contribution.id
     );
+    await this.contributionService.sendNotification(
+    contribution.usuarioId,
+    'Contribución aceptada',
+    'Tu contribución ha sido aceptada exitosamente. ¡Gracias por tu participación!'
+  );
+
 
     this.isUpdatingTable = true;
     await Promise.resolve();
@@ -317,4 +332,6 @@ closeVisualizeModal(): void {
   getEnfermedades(cultivoData: any, tipo: string): string {
     return cultivoData[tipo]?.enfermedades?.join(', ') || 'Sin enfermedades';
   }
+
+  
 }
